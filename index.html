@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./src/assets/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CruX</title>
+    <link rel="preload" href="./src/wallet/wallet.html">
+    <link rel="preload" href="./src/send-xrp/send-xrp.html">
+    <link rel="preload" href="./src/transaction-history/transaction-history.html">
+    <link rel="preload" href="./src/map/map.html">
+    <link rel="preload" href="index.css" as="style"> 
+    <link rel="stylesheet" href="index.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="main_content">
+        <header class="header" id="site_header"></header>
+        <div class="main_logo" id="heading_logo"></div>
+        <div class="links" id="site_menu"></div>
+      </div>
+    </div>
+    <script type="module" src="/index.js"></script>
+  </body>
+</html>

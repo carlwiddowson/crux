@@ -1,0 +1,28 @@
+{
+  "name": "crux",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Carl Widdowson",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "https-browserify": "^1.0.0",
+    "rollup-plugin-polyfill-node": "^0.12.0",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "vite": "^6.2.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "leaflet": "^1.9.4",
+    "vite": "^6.2.0",
+    "xrpl": "^4.0.0"
+  }
+}
