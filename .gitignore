@@ -36,4 +36,4 @@ pnpm-debug.log*
 Thumbs.db
 
 # Optional: Local development files
-*.lognode_modules/
+*.log

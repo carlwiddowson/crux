@@ -1,27 +1,123 @@
+// src/transaction-history/transaction-history.js
 import { Client, Wallet, convertHexToString, dropsToXrp } from 'xrpl';
+import { setPageTitle } from '/index.js';
 
-import siteHeader from '../helpers/site-header.js';
-import addXrplLogo from '../helpers/render-xrpl-logo.js';
-import siteMenu from '../helpers/site-menu.js';
-import renderXrplLogo from '../helpers/render-xrpl-logo';
+// Set the page title
+setPageTitle('Transaction History');
 
-siteHeader();
-addXrplLogo();
-siteMenu();
-renderXrplLogo();
-
-// Declare the variables
+// Declare variables
 let marker = null;
 
-// Get the elements from the DOM
-const txHistoryElement = document.querySelector('#tx_history_data');
-const loadMore = document.querySelector('#load_more_button');
+function getTokenName(currencyCode) {
+  if (!currencyCode) return "";
+  if (currencyCode.length === 3 && currencyCode.trim().toLowerCase() !== 'xrp') {
+    return currencyCode.trim();
+  }
+  if (currencyCode.match(/^[a-fA-F0-9]{40}$/)) {
+    const text_code = convertHexToString(currencyCode).replaceAll('\u0000', '');
+    if (text_code.match(/[a-zA-Z0-9]{3,}/) && text_code.trim().toLowerCase() !== 'xrp') {
+      return text_code;
+    }
+    return currencyCode;
+  }
+  return "";
+}
 
-// Add event listeners to the buttons
+function renderAmount(delivered) {
+  if (delivered === 'unavailable') {
+    return 'unavailable';
+  } else if (typeof delivered === 'string') {
+    return `${dropsToXrp(delivered)} XRP`;
+  } else if (typeof delivered === 'object') {
+    return `${delivered.value} ${getTokenName(delivered.currency)}.${delivered.issuer}`;
+  } else {
+    return "-";
+  }
+}
 
-// Add the header to the table
-const header = document.createElement('tr');
-header.innerHTML = `
+async function fetchTxHistory(txHistoryElement, loadMore) {
+  try {
+    loadMore.textContent = 'Loading...';
+    loadMore.disabled = true;
+
+    const wallet = Wallet.fromSeed(process.env.SEED);
+    const client = new Client(process.env.CLIENT);
+
+    await client.connect();
+
+    const payload = {
+      command: 'account_tx',
+      account: wallet.address,
+      limit: 10,
+    };
+
+    if (marker) {
+      payload.marker = marker;
+    }
+
+    const { result } = await client.request(payload);
+    const { transactions, marker: nextMarker } = result;
+
+    const values = transactions.map((transaction) => {
+      const { hash, meta, tx_json } = transaction;
+      return {
+        Account: tx_json.Account,
+        Destination: tx_json.Destination,
+        Fee: tx_json.Fee,
+        Hash: hash,
+        TransactionType: tx_json.TransactionType,
+        result: meta?.TransactionResult,
+        delivered: meta?.delivered_amount,
+      };
+    });
+
+    loadMore.style.display = nextMarker ? 'block' : 'none';
+
+    if (values.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="7">No transactions found</td>`;
+      txHistoryElement.appendChild(row);
+    } else {
+      values.forEach((value) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          ${value.Account ? `<td>${value.Account}</td>` : '<td>-</td>'}
+          ${value.Destination ? `<td>${value.Destination}</td>` : '<td>-</td>'}
+          ${value.Fee ? `<td>${dropsToXrp(value.Fee)}</td>` : '<td>-</td>'}
+          <td>${renderAmount(value.delivered)}</td>
+          ${value.TransactionType ? `<td>${value.TransactionType}</td>` : '<td>-</td>'}
+          ${value.result ? `<td>${value.result}</td>` : '<td>-</td>'}
+          ${value.Hash ? `<td><a href="https://${process.env.EXPLORER_NETWORK}.xrpl.org/transactions/${value.Hash}" target="_blank">View</a></td>` : '<td>-</td>'}
+        `;
+        txHistoryElement.appendChild(row);
+      });
+    }
+
+    await client.disconnect();
+    loadMore.textContent = 'Load More';
+    loadMore.disabled = false;
+
+    return nextMarker ?? null;
+  } catch (error) {
+    console.error('Transaction History Error:', error);
+    loadMore.textContent = 'Load More';
+    loadMore.disabled = false;
+    return null;
+  }
+}
+
+function initTransactionHistory() {
+  const txHistoryElement = document.querySelector('#tx_history_data');
+  const loadMore = document.querySelector('#load_more_button');
+
+  if (!txHistoryElement || !loadMore) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+
+  // Add table header
+  const header = document.createElement('tr');
+  header.innerHTML = `
     <th>Account</th>
     <th>Destination</th>
     <th>Fee (XRP)</th>
@@ -29,140 +125,24 @@ header.innerHTML = `
     <th>Transaction Type</th>
     <th>Result</th>
     <th>Link</th>
-`;
-txHistoryElement.appendChild(header);
+  `;
+  txHistoryElement.appendChild(header);
 
-// Converts the hex value to a string
-function getTokenName(currencyCode) {
-    if (!currencyCode) return "";
-    if (currencyCode.length === 3 && currencyCode.trim().toLowerCase() !== 'xrp') {
-        // "Standard" currency code
-        return currencyCode.trim();
-    }
-    if (currencyCode.match(/^[a-fA-F0-9]{40}$/)) {
-        // Hexadecimal currency code
-        const text_code = convertHexToString(value).replaceAll('\u0000', '')
-        if (text_code.match(/[a-zA-Z0-9]{3,}/) && text_code.trim().toLowerCase() !== 'xrp') {
-            // ASCII or UTF-8 encoded alphanumeric code, 3+ characters long
-            return text_code;
-        }
-        // Other hex format, return as-is.
-        // For parsing other rare formats, see https://github.com/XRPLF/xrpl-dev-portal/blob/master/content/_code-samples/normalize-currency-codes/js/normalize-currency-code.js
-        return currencyCode;
-    }
-    return "";
-}
-
-function renderAmount(delivered) {
-    if (delivered === 'unavailable') {
-        // special case for pre-2014 partial payments
-        return 'unavailable';
-    } else if (typeof delivered === 'string') {
-        // It's an XRP amount in drops. Convert to decimal.
-        return `${dropsToXrp(delivered)} XRP`;
-    } else if (typeof delivered === 'object') {
-        // It's a token amount.
-        return `${delivered.value} ${getTokenName(delivered.currency)}.${delivered.issuer}`;
-    } else {
-        // Could be undefined -- not all transactions deliver value
-        return "-"
-    }
-}
-
-// Fetches the transaction history from the ledger
-async function fetchTxHistory() {
-    try {
-        loadMore.textContent = 'Loading...';
-        loadMore.disabled = true;
-        const wallet = Wallet.fromSeed(process.env.SEED);
-        const client = new Client(process.env.CLIENT);
-
-        // Wait for the client to connect
-        await client.connect();
-
-        // Get the transaction history
-        const payload = {
-            command: 'account_tx',
-            account: wallet.address,
-            limit: 10,
-        };
-
-        if (marker) {
-            payload.marker = marker;
-        }
-
-        // Wait for the response: use the client.request() method to send the payload
-        const { result } = await client.request(payload);
-
-        const { transactions, marker: nextMarker } = result;
-
-        // Add the transactions to the table
-        const values = transactions.map((transaction) => {
-            const { hash, meta, tx_json } = transaction;
-            return {
-                Account: tx_json.Account,
-                Destination: tx_json.Destination,
-                Fee: tx_json.Fee,
-                Hash: hash,
-                TransactionType: tx_json.TransactionType,
-                result: meta?.TransactionResult,
-                delivered: meta?.delivered_amount
-            };
-        });
-
-        // If there are no more transactions, hide the load more button
-        loadMore.style.display = nextMarker ? 'block' : 'none';
-
-        // If there are no transactions, show a message
-        // Create a new row: https://developer.mozilla.org/en-US/docs/Web/API/Document/createElement
-        // Add the row to the table: https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild
-
-        if (values.length === 0) {
-            const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="6">No transactions found</td>`;
-            txHistoryElement.appendChild(row);
-        } else {
-            // Otherwise, show the transactions by iterating over each transaction and adding it to the table
-            values.forEach((value) => {
-                const row = document.createElement('tr');
-                // Add the transaction details to the row
-                row.innerHTML = `
-                ${value.Account ? `<td>${value.Account}</td>` : '-'}
-                ${value.Destination ? `<td>${value.Destination}</td>` : '-'}
-                ${value.Fee ? `<td>${dropsToXrp(value.Fee)}</td>` : '-'}
-                ${renderAmount(value.delivered)}
-                ${value.TransactionType ? `<td>${value.TransactionType}</td>` : '-'}
-                ${value.result ? `<td>${value.result}</td>` : '-'}
-                ${value.Hash ? `<td><a href="https://${process.env.EXPLORER_NETWORK}.xrpl.org/transactions/${value.Hash}" target="_blank">View</a></td>` : '-'}`;
-                // Add the row to the table
-                txHistoryElement.appendChild(row);
-            });
-        }
-
-        // Disconnect
-        await client.disconnect();
-
-        // Enable the load more button only if there are more transactions
-        loadMore.textContent = 'Load More';
-        loadMore.disabled = false;
-
-        // Return the marker
-        return nextMarker ?? null;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
-}
-
-// Render the transaction history
-async function renderTxHistory() {
-    // Fetch the transaction history
-    marker = await fetchTxHistory();
+  // Render transaction history
+  async function renderTxHistory() {
+    marker = await fetchTxHistory(txHistoryElement, loadMore);
     loadMore.addEventListener('click', async () => {
-        const nextMarker = await fetchTxHistory();
-        marker = nextMarker;
+      const nextMarker = await fetchTxHistory(txHistoryElement, loadMore);
+      marker = nextMarker;
     });
+  }
+
+  renderTxHistory();
 }
 
-// Call the renderTxHistory() function
-renderTxHistory();
+// Ensure DOM is ready before initializing
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTransactionHistory);
+} else {
+  initTransactionHistory();
+}
