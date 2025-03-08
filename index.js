@@ -56,8 +56,8 @@ async function loadComponent(containerId, componentUrl) {
   
   // Load components and initial page
   document.addEventListener('DOMContentLoaded', () => {
-    loadComponent('header-container', '/src/components/header.html');
-    loadComponent('footer-container', '/src/components/footer.html');
+    // loadComponent('header-container', '/src/components/header.html');
+    // loadComponent('footer-container', '/src/components/footer.html');
   
     // Load initial page based on URL
     const initialPage = getPageFromPath();

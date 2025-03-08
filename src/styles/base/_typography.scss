@@ -1,4 +1,6 @@
 // src/styles/base/_typography.scss
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
 body {
     font-family: $font-family;
     line-height: 1.6;
@@ -8,3 +10,13 @@ body {
   h1, h2, h3 {
     margin-bottom: $spacing-unit;
   }
+
+  // <weight>: Use a value from 100 to 900
+// <uniquifier>: Use a unique and descriptive class name
+
+// .montserrat-<uniquifier> {
+//   font-family: "Montserrat", sans-serif;
+//   font-optical-sizing: auto;
+//   font-weight: <weight>;
+//   font-style: normal;
+// }
