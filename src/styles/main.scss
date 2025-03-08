@@ -1,0 +1,20 @@
+// src/styles/main.scss
+// Import abstracts
+@import 'abstracts/variables';
+@import 'abstracts/mixins';
+
+// Import base styles
+@import 'base/reset';
+@import 'base/typography';
+
+// Import component styles
+@import 'components/header';
+@import 'components/footer';
+@import 'components/filters';
+
+// Import page-specific styles
+@import 'pages/dashboard';
+@import 'pages/wallet';
+@import 'pages/send-xrp';
+@import 'pages/transaction-history';
+@import 'pages/map';

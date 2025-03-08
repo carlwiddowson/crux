@@ -1,0 +1,10 @@
+// src/styles/base/_typography.scss
+body {
+    font-family: $font-family;
+    line-height: 1.6;
+    color: #333;
+  }
+  
+  h1, h2, h3 {
+    margin-bottom: $spacing-unit;
+  }

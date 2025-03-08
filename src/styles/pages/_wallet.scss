@@ -1,0 +1,36 @@
+// src/styles/pages/_wallet.scss
+.wallet_details {
+    padding: $spacing-unit;
+  
+    .heading_h3 {
+      font-size: 1.3rem;
+      color: $primary-color;
+    }
+  
+    span {
+      display: block;
+      margin: $spacing-unit / 2 0;
+    }
+  
+    .view_more a {
+      color: $primary-color;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+  
+  .ledger_details {
+    padding: $spacing-unit;
+  
+    .heading_h3 {
+      font-size: 1.3rem;
+      color: $primary-color;
+    }
+  
+    span {
+      display: block;
+      margin: $spacing-unit / 2 0;
+    }
+  }

@@ -1,0 +1,43 @@
+// src/styles/components/_filters.scss
+.filter-container {
+    width: 300px;
+    position: relative;
+    z-index: 1000;
+    margin-top: $spacing-unit * 2;
+    margin-right: $spacing-unit;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-unit;
+  
+    .barrels-container,
+    .price-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  
+    span.no-results {
+      font-size: 14px;
+      color: #333;
+    }
+  
+    .star-rating {
+      display: flex;
+      gap: 5px;
+  
+      .star {
+        cursor: pointer;
+        color: #000;
+  
+        &:hover svg,
+        &.active svg {
+          fill: #ffd700;
+          stroke: #ffd700;
+        }
+      }
+    }
+  
+    label {
+      font-weight: bold;
+    }
+  }
