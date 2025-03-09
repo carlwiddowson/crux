@@ -3,6 +3,7 @@
 /crux/
 ├── src/
 │   ├── helpers/
+│   │   ├── xrpl-client.js
 │   │   ├── get-wallet-details.js
 │   │   ├── submit-transaction.js
 │   │   ├── data.js             

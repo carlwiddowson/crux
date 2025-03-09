@@ -30,7 +30,7 @@ export default async function getWalletDetails({ client }) {
         // Calculate the reserves by multiplying the owner count by the increment and adding the base reserve to it.
         const accountReserves = ownerCount * reserve_inc_xrp + reserve_base_xrp;
 
-        //console.log('Got wallet details!');
+        console.log('Got wallet details!');
 
         return { 
             account_data, 

@@ -1,30 +1,26 @@
-// src/wallet/wallet.js
-import { Client, dropsToXrp, rippleTimeToISOTime } from 'xrpl';
+import { dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
+import xrplClientManager from '../helpers/xrpl-client.js';
 import getWalletDetails from '../helpers/get-wallet-details.js';
 
-// Set the page title
 setPageTitle('Wallet');
 
-// Initialize wallet functionality
-const initWallet = async () => {
-  const client = new Client(process.env.CLIENT);
+async function initWallet() {
+  const client = await xrplClientManager.getClient();
+  const pageKey = 'wallet'; // Unique key for this page’s listeners
 
-  // Get DOM elements
   const walletElement = document.querySelector('#wallet');
   const walletLoadingDiv = document.querySelector('#loading_wallet_details');
   const ledgerLoadingDiv = document.querySelector('#loading_ledger_details');
 
+  if (!walletElement || !walletLoadingDiv || !ledgerLoadingDiv) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+
   try {
-    await client.connect();
+    await client.request({ command: 'subscribe', streams: ['ledger'] });
 
-    // Subscribe to ledger stream
-    await client.request({
-      command: 'subscribe',
-      streams: ['ledger'],
-    });
-
-    // Fetch wallet details
     getWalletDetails({ client })
       .then(({ account_data, accountReserves, xAddress, address }) => {
         walletElement.querySelector('.wallet_address').textContent = `Wallet Address: ${account_data.Account}`;
@@ -40,28 +36,20 @@ const initWallet = async () => {
         walletLoadingDiv.style.display = 'none';
       });
 
-    // Fetch latest ledger details
-    client.on('ledgerClosed', (ledger) => {
+    xrplClientManager.addListener('ledgerClosed', (ledger) => {
       ledgerLoadingDiv.style.display = 'none';
-      const ledgerIndex = document.querySelector('#ledger_index');
-      const ledgerHash = document.querySelector('#ledger_hash');
-      const closeTime = document.querySelector('#close_time');
-      ledgerIndex.textContent = `Ledger Index: ${ledger.ledger_index}`;
-      ledgerHash.textContent = `Ledger Hash: ${ledger.ledger_hash}`;
-      closeTime.textContent = `Close Time: ${rippleTimeToISOTime(ledger.ledger_time)}`;
-    });
+      document.querySelector('#ledger_index').textContent = `Ledger Index: ${ledger.ledger_index}`;
+      document.querySelector('#ledger_hash').textContent = `Ledger Hash: ${ledger.ledger_hash}`;
+      document.querySelector('#close_time').textContent = `Close Time: ${rippleTimeToISOTime(ledger.ledger_time)}`;
+    }, pageKey);
 
   } catch (error) {
-    await client.disconnect();
     console.error('Wallet JS Error:', error);
   }
-};
+}
 
-// Ensure DOM is ready before initializing
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initWallet);
 } else {
   initWallet();
 }
-
-// Note: siteHeader, addXrplLogo, and siteMenu are now handled in header.html or index.js

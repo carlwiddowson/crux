@@ -1,13 +1,13 @@
-// src/transaction-history/transaction-history.js
-import { Client, Wallet, convertHexToString, dropsToXrp } from 'xrpl';
+import { Wallet, convertHexToString, dropsToXrp } from 'xrpl';
 import { setPageTitle } from '/index.js';
+import xrplClientManager from '../helpers/xrpl-client.js';
 
-// Set the page title
 setPageTitle('Transaction History');
 
-// Declare variables
+// Declare marker as a module-level variable to persist across "Load More" clicks
 let marker = null;
 
+// Helper function to determine token name from currency code
 function getTokenName(currencyCode) {
   if (!currencyCode) return "";
   if (currencyCode.length === 3 && currencyCode.trim().toLowerCase() !== 'xrp') {
@@ -23,6 +23,7 @@ function getTokenName(currencyCode) {
   return "";
 }
 
+// Helper function to render the delivered amount
 function renderAmount(delivered) {
   if (delivered === 'unavailable') {
     return 'unavailable';
@@ -35,15 +36,15 @@ function renderAmount(delivered) {
   }
 }
 
+// Fetch and render transaction history
 async function fetchTxHistory(txHistoryElement, loadMore) {
+  const client = await xrplClientManager.getClient();
+
   try {
     loadMore.textContent = 'Loading...';
     loadMore.disabled = true;
 
     const wallet = Wallet.fromSeed(process.env.SEED);
-    const client = new Client(process.env.CLIENT);
-
-    await client.connect();
 
     const payload = {
       command: 'account_tx',
@@ -71,6 +72,7 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
       };
     });
 
+    // Show or hide "Load More" button based on whether more transactions exist
     loadMore.style.display = nextMarker ? 'block' : 'none';
 
     if (values.length === 0) {
@@ -93,7 +95,6 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
       });
     }
 
-    await client.disconnect();
     loadMore.textContent = 'Load More';
     loadMore.disabled = false;
 
@@ -128,13 +129,19 @@ function initTransactionHistory() {
   `;
   txHistoryElement.appendChild(header);
 
-  // Render transaction history
+  // Render transaction history and handle "Load More"
   async function renderTxHistory() {
     marker = await fetchTxHistory(txHistoryElement, loadMore);
-    loadMore.addEventListener('click', async () => {
-      const nextMarker = await fetchTxHistory(txHistoryElement, loadMore);
-      marker = nextMarker;
-    });
+
+    // Remove any existing click listener to avoid duplicates
+    loadMore.removeEventListener('click', loadMoreHandler);
+    loadMore.addEventListener('click', loadMoreHandler);
+  }
+
+  // Define the "Load More" handler separately to allow removal
+  async function loadMoreHandler() {
+    const nextMarker = await fetchTxHistory(txHistoryElement, loadMore);
+    marker = nextMarker;
   }
 
   renderTxHistory();

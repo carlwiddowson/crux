@@ -1,4 +1,3 @@
-// src/map/map.js
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import companies from '../helpers/data.js';
@@ -14,6 +13,7 @@ function formatNumberWithCommas(number) {
 function initMap() {
   const mapDiv = document.getElementById('map');
   const filterContainer = document.querySelector('.filter-container');
+  const contentDiv = document.getElementById('page-content'); // Use the content container
   const categorySelect = document.getElementById('category-select');
   const ratingContainer = document.getElementById('star-rating');
   const barrelsSlider = document.getElementById('barrels-slider');
@@ -22,16 +22,27 @@ function initMap() {
   const priceValue = document.getElementById('price-value');
   const noResultsMessage = document.getElementById('no-results');
 
-  if (!mapDiv || !filterContainer || !categorySelect || !ratingContainer || !barrelsSlider || !priceSlider) {
+  // Check if required elements exist
+  if (!mapDiv || !filterContainer || !contentDiv || !categorySelect || !ratingContainer || !barrelsSlider || !priceSlider) {
     console.error('Required DOM elements not found');
     return;
   }
 
-  // Initialize Leaflet map
+  // Ensure filterContainer is before mapDiv within #page-content
+  if (filterContainer.nextSibling !== mapDiv) {
+    contentDiv.insertBefore(filterContainer, mapDiv);
+  }
+
+  // Initialize Leaflet map with error handling
   const map = L.map(mapDiv);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  });
+  tileLayer.on('tileerror', (error) => {
+    console.warn('Tile load error suppressed:', error);
+    // Prevents console spam if tiles fail due to extension interference
+  });
+  tileLayer.addTo(map);
 
   // Create markers
   const markers = companies.map(company => {
@@ -122,12 +133,6 @@ function initMap() {
   markers.forEach(marker => marker.addTo(map));
   const initialBounds = L.latLngBounds(companies.map(c => [c.lat, c.lng]));
   map.fitBounds(initialBounds, { padding: [50, 50] });
-
-  // Move filter container before map (ensures proper stacking)
-  const appDiv = document.getElementById('app');
-  if (appDiv) {
-    appDiv.insertBefore(filterContainer, mapDiv);
-  }
 }
 
 // Ensure DOM is ready before initializing

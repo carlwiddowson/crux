@@ -1,16 +1,15 @@
-// src/send-xrp/send-xrp.js
-import { Client, Wallet, dropsToXrp, isValidClassicAddress, xrpToDrops } from 'xrpl';
+import { Wallet, dropsToXrp, isValidClassicAddress, xrpToDrops } from 'xrpl';
 import { setPageTitle } from '/index.js';
+import xrplClientManager from '../helpers/xrpl-client.js';
 import getWalletDetails from '../helpers/get-wallet-details.js';
 import submitTransaction from '../helpers/submit-transaction.js';
 
-// Set the page title
 setPageTitle('Send XRP');
 
 async function initSendXrp() {
-  const client = new Client(process.env.CLIENT);
+  const client = await xrplClientManager.getClient();
+  const pageKey = 'send-xrp';
 
-  // Get DOM elements
   const destinationAddress = document.querySelector('#destination_address');
   const amount = document.querySelector('#amount');
   const destinationTag = document.querySelector('#destination_tag');
@@ -22,36 +21,26 @@ async function initSendXrp() {
     return;
   }
 
-  // Disable submit button by default
   submitTxBtn.disabled = true;
   let isValidDestinationAddress = false;
-  const allInputs = document.querySelectorAll('#destination_address, #amount');
+  const allInputs = [destinationAddress, amount];
 
   try {
-    await client.connect();
     const wallet = Wallet.fromSeed(process.env.SEED);
+    await client.request({ command: 'subscribe', accounts: [wallet.address] });
 
-    // Subscribe to account transaction stream
-    await client.request({
-      command: 'subscribe',
-      accounts: [wallet.address],
-    });
-
-    // Fetch and display initial available balance
     const updateBalance = async () => {
       const { accountReserves, account_data } = await getWalletDetails({ client });
       availableBalanceElement.textContent = `Available Balance: ${dropsToXrp(account_data.Balance) - accountReserves} XRP`;
     };
     await updateBalance();
 
-    // Update balance on successful transaction
-    client.on('transaction', (response) => {
+    xrplClientManager.addListener('transaction', (response) => {
       if (response.validated && response.transaction.TransactionType === 'Payment') {
         updateBalance();
       }
-    });
+    }, pageKey);
 
-    // Validate destination address
     const validateAddress = () => {
       destinationAddress.value = destinationAddress.value.trim();
       if (isValidClassicAddress(destinationAddress.value)) {
@@ -63,7 +52,6 @@ async function initSendXrp() {
       }
     };
 
-    // Event listeners
     destinationAddress.addEventListener('input', validateAddress);
 
     amount.addEventListener('keydown', (event) => {
@@ -74,12 +62,19 @@ async function initSendXrp() {
       }
     });
 
+    function updateButtonState() {
+      const values = allInputs.map(v => v.value.trim());
+      submitTxBtn.disabled = !isValidDestinationAddress || values.includes('');
+      console.log('Button state:', { values, isValidDestinationAddress, disabled: submitTxBtn.disabled });
+    }
+
     allInputs.forEach(input => {
-      input.addEventListener('input', () => {
-        const values = Array.from(allInputs).map(v => v.value);
-        submitTxBtn.disabled = !isValidDestinationAddress || values.includes('');
-      });
+      input.addEventListener('input', updateButtonState);
+      input.addEventListener('change', updateButtonState);
     });
+
+    // Initial state check
+    updateButtonState();
 
     submitTxBtn.addEventListener('click', async () => {
       try {
@@ -110,16 +105,15 @@ async function initSendXrp() {
       } finally {
         submitTxBtn.disabled = false;
         submitTxBtn.textContent = 'Submit Transaction';
+        updateButtonState(); // Re-evaluate after submission
       }
     });
 
   } catch (error) {
     console.error('Send XRP Error:', error);
-    await client.disconnect();
   }
 }
 
-// Ensure DOM is ready before initializing
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initSendXrp);
 } else {
