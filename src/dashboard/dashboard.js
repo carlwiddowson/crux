@@ -4,8 +4,8 @@ import { Wallet, dropsToXrp } from 'xrpl';
 import Chart from 'chart.js/auto';
 import xrplClientManager from '../helpers/xrpl-client.js';
 import getWalletDetails from '../helpers/get-wallet-details.js';
+import { deliveries } from '../helpers/data.js'; // Import deliveries
 
-// Set page title
 setPageTitle('Dashboard');
 
 async function initDashboard() {
@@ -15,9 +15,10 @@ async function initDashboard() {
     return;
   }
 
-  const chartCanvas = document.getElementById('xrp-donut-chart');
-  if (!chartCanvas) {
-    console.error('Chart canvas not found');
+  const xrpChartCanvas = document.getElementById('xrp-donut-chart');
+  const deliveryChartCanvas = document.getElementById('delivery-bar-chart');
+  if (!xrpChartCanvas || !deliveryChartCanvas) {
+    console.error('Chart canvases not found');
     return;
   }
 
@@ -25,16 +26,14 @@ async function initDashboard() {
   const pageKey = 'dashboard';
 
   try {
-    // Fetch wallet balance
+    // XRP Overview Chart (unchanged)
     const { account_data } = await getWalletDetails({ client });
     const balance = parseFloat(dropsToXrp(account_data.Balance));
-
-    // Fetch total sent XRP from transaction history
     const wallet = Wallet.fromSeed(process.env.SEED);
     const { result } = await client.request({
       command: 'account_tx',
       account: wallet.address,
-      limit: 100, // Adjust limit as needed
+      limit: 100,
     });
 
     let totalSent = 0;
@@ -47,13 +46,10 @@ async function initDashboard() {
       }
     });
 
-    // Calculate remaining balance (for visualization purposes)
     const remainingBalance = balance - totalSent;
-
-    // Render donut chart
-    const ctx = chartCanvas.getContext('2d');
-    new Chart(ctx, {
-      type: 'doughnut', // 'doughnut' for donut chart
+    const xrpCtx = xrpChartCanvas.getContext('2d');
+    new Chart(xrpCtx, {
+      type: 'doughnut',
       data: {
         labels: ['Remaining Balance', 'Total Sent'],
         datasets: [{
@@ -66,23 +62,67 @@ async function initDashboard() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            position: 'bottom',
+          legend: { position: 'bottom' },
+          tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw.toFixed(2)} XRP` } },
+        },
+      },
+    });
+
+    // Delivery Status Chart
+    const statusCounts = {
+      'In-transit': 0,
+      'Cancelled': 0,
+      'Pending': 0,
+      'Delivered': 0,
+    };
+
+    deliveries.forEach(delivery => {
+      statusCounts[delivery.status] = (statusCounts[delivery.status] || 0) + 1;
+    });
+
+    const deliveryCtx = deliveryChartCanvas.getContext('2d');
+    new Chart(deliveryCtx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(statusCounts),
+        datasets: [{
+          label: 'Number of Deliveries',
+          data: Object.values(statusCounts),
+          backgroundColor: [
+            'blue',   // In-transit
+            'red',    // Cancelled
+            'orange', // Pending
+            'green',  // Delivered
+          ],
+          borderWidth: 1,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Count' },
           },
-          tooltip: {
-            callbacks: {
-              label: (context) => `${context.label}: ${context.raw.toFixed(2)} XRP`,
-            },
+          x: {
+            title: { display: true, text: 'Status' },
           },
+        },
+        plugins: {
+          legend: { display: false }, // Hide legend since colors are intuitive
+          tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw} deliveries` } },
         },
       },
     });
 
     console.log(`Dashboard initialized with balance: ${balance} XRP, total sent: ${totalSent} XRP`);
+    console.log('Delivery status counts:', statusCounts);
 
   } catch (error) {
-    console.error('Error initializing dashboard chart:', error);
-    chartCanvas.parentElement.innerHTML += '<p>Error loading chart data</p>';
+    console.error('Error initializing dashboard charts:', error);
+    xrpChartCanvas.parentElement.innerHTML += '<p>Error loading XRP chart data</p>';
+    deliveryChartCanvas.parentElement.innerHTML += '<p>Error loading delivery chart data</p>';
   }
 
   // Verify card layout
@@ -94,7 +134,6 @@ async function initDashboard() {
   }
 }
 
-// Ensure DOM is ready before initializing
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDashboard);
 } else {

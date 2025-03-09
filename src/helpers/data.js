@@ -1,4 +1,5 @@
 // src/helpers/data.js
+// Companies data
 const companies = [
     { name: "ExxonMobil", lat: 45.1234, lng: -93.4567, barrels: 750000, category: "Light", rating: 4, pricePerBarrel: 65 },
     { name: "Chevron", lat: 32.9876, lng: -117.5432, barrels: 1200000, category: "Medium", rating: 3, pricePerBarrel: 72 },
@@ -26,4 +27,39 @@ const companies = [
     { name: "Kuwait Petroleum", lat: 29.3456, lng: 47.9876, barrels: 1500000, category: "Heavy", rating: 2, pricePerBarrel: 53 },
     { name: "Gazprom Neft", lat: 59.4321, lng: 30.6789, barrels: 700000, category: "Light", rating: 5, pricePerBarrel: 91 }
 ];
-export default companies;
+
+// Deliveries data
+const deliveries = [
+    { company: "ExxonMobil", from: "Houston, TX", to: "New York, NY", status: "In-transit", deliveryDate: "2025-03-15", completion: 75 },
+    { company: "Chevron", from: "San Francisco, CA", to: "Chicago, IL", status: "Delivered", deliveryDate: "2025-03-07", completion: 100 },
+    { company: "BP", from: "London, UK", to: "Paris, FR", status: "Cancelled", deliveryDate: "2025-03-10", completion: 0 },
+    { company: "Shell", from: "Amsterdam, NL", to: "Berlin, DE", status: "Pending", deliveryDate: "2025-03-20", completion: 10 },
+    { company: "TotalEnergies", from: "Paris, FR", to: "Madrid, ES", status: "In-transit", deliveryDate: "2025-03-14", completion: 60 },
+    { company: "ConocoPhillips", from: "Anchorage, AK", to: "Seattle, WA", status: "Delivered", deliveryDate: "2025-03-05", completion: 100 },
+    { company: "Eni", from: "Rome, IT", to: "Vienna, AT", status: "Pending", deliveryDate: "2025-03-22", completion: 25 },
+    { company: "Equinor", from: "Oslo, NO", to: "Stockholm, SE", status: "In-transit", deliveryDate: "2025-03-16", completion: 45 },
+    { company: "Occidental", from: "Los Angeles, CA", to: "Denver, CO", status: "Cancelled", deliveryDate: "2025-03-12", completion: 0 },
+    { company: "Saudi Aramco", from: "Riyadh, SA", to: "Dubai, UAE", status: "Delivered", deliveryDate: "2025-03-08", completion: 100 },
+    { company: "Petrobras", from: "Rio de Janeiro, BR", to: "Sao Paulo, BR", status: "In-transit", deliveryDate: "2025-03-17", completion: 80 },
+    { company: "Lukoil", from: "Moscow, RU", to: "St. Petersburg, RU", status: "Pending", deliveryDate: "2025-03-25", completion: 15 },
+    { company: "Rosneft", from: "Moscow, RU", to: "Kazan, RU", status: "Delivered", deliveryDate: "2025-03-06", completion: 100 },
+    { company: "Marathon Oil", from: "Houston, TX", to: "Dallas, TX", status: "In-transit", deliveryDate: "2025-03-18", completion: 55 },
+    { company: "Hess Corp", from: "New York, NY", to: "Boston, MA", status: "Cancelled", deliveryDate: "2025-03-11", completion: 0 },
+    { company: "Sinopec", from: "Beijing, CN", to: "Shanghai, CN", status: "Pending", deliveryDate: "2025-03-23", completion: 30 },
+    { company: "CNPC", from: "Beijing, CN", to: "Chengdu, CN", status: "Delivered", deliveryDate: "2025-03-09", completion: 100 },
+    { company: "Phillips 66", from: "Houston, TX", to: "Phoenix, AZ", status: "In-transit", deliveryDate: "2025-03-19", completion: 70 },
+    { company: "Valero", from: "San Antonio, TX", to: "Miami, FL", status: "Pending", deliveryDate: "2025-03-26", completion: 20 },
+    { company: "Repsol", from: "Madrid, ES", to: "Barcelona, ES", status: "Delivered", deliveryDate: "2025-03-04", completion: 100 },
+    { company: "Devon Energy", from: "Oklahoma City, OK", to: "Tulsa, OK", status: "In-transit", deliveryDate: "2025-03-13", completion: 65 },
+    { company: "Apache Corp", from: "Houston, TX", to: "Austin, TX", status: "Cancelled", deliveryDate: "2025-03-10", completion: 0 },
+    { company: "Pemex", from: "Mexico City, MX", to: "Monterrey, MX", status: "Pending", deliveryDate: "2025-03-27", completion: 5 },
+    { company: "Kuwait Petroleum", from: "Kuwait City, KW", to: "Doha, QA", status: "Delivered", deliveryDate: "2025-03-03", completion: 100 },
+    { company: "Gazprom", from: "Moscow, RU", to: "Minsk, BY", status: "In-transit", deliveryDate: "2025-03-21", completion: 50 },
+    { company: "ExxonMobil", from: "Calgary, CA", to: "Toronto, CA", status: "Pending", deliveryDate: "2025-03-28", completion: 35 },
+    { company: "Chevron", from: "Perth, AU", to: "Sydney, AU", status: "Delivered", deliveryDate: "2025-03-02", completion: 100 },
+    { company: "BP", from: "Aberdeen, UK", to: "Oslo, NO", status: "In-transit", deliveryDate: "2025-03-15", completion: 85 },
+    { company: "Shell", from: "Singapore, SG", to: "Jakarta, ID", status: "Cancelled", deliveryDate: "2025-03-14", completion: 0 },
+    { company: "TotalEnergies", from: "Lagos, NG", to: "Accra, GH", status: "Pending", deliveryDate: "2025-03-29", completion: 40 },
+  ];
+  
+  export { companies, deliveries };

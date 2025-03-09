@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import companies from '../helpers/data.js';
+import { companies } from '../helpers/data.js'; // Changed from 'companies' default to named import
 import { setPageTitle } from '/index.js';
 
 // Set the page title

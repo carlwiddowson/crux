@@ -7,7 +7,7 @@
       flex-wrap: wrap;
       flex-direction: row;
       gap: 20px;
-      padding: 20px;
+      padding: 20px 20px 50px 20px;
     }
 
     .card {
@@ -17,8 +17,8 @@
       padding: 20px;
       text-align: center;
       transition: transform 0.2s ease;
-      flex: 1 1 250px; /* Flex-grow, flex-shrink, and basis: cards grow/shrink but start at 250px */
-      max-width: 300px; 
+      //flex: 1 1 250px; /* Flex-grow, flex-shrink, and basis: cards grow/shrink but start at 250px */
+      width: 32%; 
 
       &:hover {
         transform: translateY(-5px);
@@ -51,21 +51,30 @@
         }
       }
     }
-    .balance-chart {
-      margin-bottom: 30px;
-      text-align: center;
-    
-      .chart-heading {
-        font-size: 1.75rem;
-        color: #333;
-        margin-bottom: 15px;
+    .charts {
+      display: flex;
+      gap: 20px;
+
+      .chart {
+        width: 45%;
       }
-    
-      .chart-container {
-        position: relative;
-        max-width: 400px;
-        margin: 0 auto; /* Center the chart */
-        height: 300px; /* Fixed height for consistency */
+      .balance-chart,
+      .delivery-status-chart {
+        margin-bottom: 30px;
+        text-align: center;
+
+        .chart-heading {
+          font-size: 1.75rem;
+          color: #333;
+          margin-bottom: 15px;
+        }
+
+        .chart-container {
+          position: relative;
+          max-width: 400px;
+          margin: 0 auto;
+          height: 300px;
+        }
       }
     }
   }
