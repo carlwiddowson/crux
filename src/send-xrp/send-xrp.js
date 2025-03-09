@@ -1,3 +1,4 @@
+// src/send-xrp/send-xrp.js
 import { Wallet, dropsToXrp, isValidClassicAddress, xrpToDrops } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
@@ -15,6 +16,10 @@ async function initSendXrp() {
   const destinationTag = document.querySelector('#destination_tag');
   const submitTxBtn = document.querySelector('#submit_tx_button');
   const availableBalanceElement = document.querySelector('#available_balance');
+
+  console.log('Destination address:', destinationAddress); // Debug
+  console.log('Amount:', amount); // Debug
+  console.log('Submit button:', submitTxBtn); // Debug
 
   if (!destinationAddress || !amount || !submitTxBtn || !availableBalanceElement) {
     console.error('Required DOM elements not found');
@@ -73,7 +78,6 @@ async function initSendXrp() {
       input.addEventListener('change', updateButtonState);
     });
 
-    // Initial state check
     updateButtonState();
 
     submitTxBtn.addEventListener('click', async () => {
@@ -105,12 +109,13 @@ async function initSendXrp() {
       } finally {
         submitTxBtn.disabled = false;
         submitTxBtn.textContent = 'Submit Transaction';
-        updateButtonState(); // Re-evaluate after submission
+        updateButtonState();
       }
     });
 
   } catch (error) {
     console.error('Send XRP Error:', error);
+    availableBalanceElement.textContent = 'Error loading balance';
   }
 }
 

@@ -1,17 +1,23 @@
 <!-- src/wallet/wallet.html -->
-<div class="wallet_details" id="wallet">
-  <div class="heading_h3">Account Info:</div>
-  <div id="loading_wallet_details">Loading Wallet Details...</div>
-  <span class="wallet_address"></span>
-  <span class="wallet_balance"></span>
-  <span class="wallet_reserve"></span>
-  <span class="wallet_xaddress"></span>
-  <span class="view_more"><a id="view_more_button">View More</a></span>
-</div>
-<div class="ledger_details">
-  <div class="heading_h3">Latest Validated Ledger:</div>
-  <div id="loading_ledger_details">Loading Ledger Details...</div>
-  <span class="ledger_index" id="ledger_index"></span>
-  <span class="ledger_hash" id="ledger_hash"></span>
-  <span class="close_time" id="close_time"></span>
+<div class="wallet-container">
+  <div class="wallet-header">
+  </div>
+  <div class="wallet-content">
+    <div class="wallet-card" id="wallet">
+      <h2 class="card-title">Wallet Details</h2>
+      <div id="loading_wallet_details" class="loading">Loading wallet details...</div>
+      <p class="wallet-address detail-item">Wallet Address: <span>Loading...</span></p>
+      <p class="wallet-balance detail-item">Wallet Balance: <span>Loading...</span></p>
+      <p class="wallet-reserve detail-item">Wallet Reserve: <span>Loading...</span></p>
+      <p class="wallet-xaddress detail-item">X-Address: <span>Loading...</span></p>
+      <button id="view_more_button" class="view-more-btn">View More</button>
+    </div>
+    <div class="ledger-card">
+      <h2 class="card-title">Ledger Details</h2>
+      <div id="loading_ledger_details" class="loading">Loading ledger details...</div>
+      <p class="ledger-index detail-item">Ledger Index: <span>Loading...</span></p>
+      <p class="ledger-hash detail-item">Ledger Hash: <span>Loading...</span></p>
+      <p class="close-time detail-item">Close Time: <span>Loading...</span></p>
+    </div>
+  </div>
 </div>

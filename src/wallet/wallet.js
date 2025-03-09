@@ -1,3 +1,4 @@
+// src/wallet/wallet.js
 import { dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
@@ -7,13 +8,17 @@ setPageTitle('Wallet');
 
 async function initWallet() {
   const client = await xrplClientManager.getClient();
-  const pageKey = 'wallet'; // Unique key for this page’s listeners
+  const pageKey = 'wallet';
 
   const walletElement = document.querySelector('#wallet');
   const walletLoadingDiv = document.querySelector('#loading_wallet_details');
   const ledgerLoadingDiv = document.querySelector('#loading_ledger_details');
+  const viewMoreBtn = document.querySelector('#view_more_button');
 
-  if (!walletElement || !walletLoadingDiv || !ledgerLoadingDiv) {
+  console.log('Wallet element:', walletElement); // Debug
+  console.log('View more button:', viewMoreBtn); // Debug
+
+  if (!walletElement || !walletLoadingDiv || !ledgerLoadingDiv || !viewMoreBtn) {
     console.error('Required DOM elements not found');
     return;
   }
@@ -23,12 +28,12 @@ async function initWallet() {
 
     getWalletDetails({ client })
       .then(({ account_data, accountReserves, xAddress, address }) => {
-        walletElement.querySelector('.wallet_address').textContent = `Wallet Address: ${account_data.Account}`;
-        walletElement.querySelector('.wallet_balance').textContent = `Wallet Balance: ${dropsToXrp(account_data.Balance)} XRP`;
-        walletElement.querySelector('.wallet_reserve').textContent = `Wallet Reserve: ${accountReserves} XRP`;
-        walletElement.querySelector('.wallet_xaddress').textContent = `X-Address: ${xAddress}`;
+        walletElement.querySelector('.wallet-address span').textContent = account_data.Account;
+        walletElement.querySelector('.wallet-balance span').textContent = `${dropsToXrp(account_data.Balance)} XRP`;
+        walletElement.querySelector('.wallet-reserve span').textContent = `${accountReserves} XRP`;
+        walletElement.querySelector('.wallet-xaddress span').textContent = xAddress;
 
-        walletElement.querySelector('#view_more_button').addEventListener('click', () => {
+        viewMoreBtn.addEventListener('click', () => {
           window.open(`https://${process.env.EXPLORER_NETWORK}.xrpl.org/accounts/${address}`, '_blank');
         });
       })
@@ -38,13 +43,15 @@ async function initWallet() {
 
     xrplClientManager.addListener('ledgerClosed', (ledger) => {
       ledgerLoadingDiv.style.display = 'none';
-      document.querySelector('#ledger_index').textContent = `Ledger Index: ${ledger.ledger_index}`;
-      document.querySelector('#ledger_hash').textContent = `Ledger Hash: ${ledger.ledger_hash}`;
-      document.querySelector('#close_time').textContent = `Close Time: ${rippleTimeToISOTime(ledger.ledger_time)}`;
+      document.querySelector('.ledger-index span').textContent = ledger.ledger_index;
+      document.querySelector('.ledger-hash span').textContent = ledger.ledger_hash;
+      document.querySelector('.close-time span').textContent = rippleTimeToISOTime(ledger.ledger_time);
     }, pageKey);
 
   } catch (error) {
     console.error('Wallet JS Error:', error);
+    walletLoadingDiv.textContent = 'Error loading wallet details';
+    ledgerLoadingDiv.textContent = 'Error loading ledger details';
   }
 }
 

@@ -1,5 +1,11 @@
 <!-- src/transaction-history/transaction-history.html -->
-<div class="tx_history_container">
-  <div class="tx_history_data" id="tx_history_data"></div>
-  <button class="load_more_button" id="load_more_button">Load More</button>
+<div class="transaction-container">
+  <div class="transaction-header">
+    <div class="transaction-controls">
+      <button id="load_more_button" class="load-more-btn">Load More</button>
+    </div>
+  </div>
+  <div class="transaction-table-wrapper">
+    <table id="tx_history_data" class="transaction-table"></table>
+  </div>
 </div>

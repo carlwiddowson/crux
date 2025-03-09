@@ -1,12 +1,23 @@
 <!-- src/send-xrp/send-xrp.html -->
-<div class="send_xrp_container">
-  <div class="available_balance" id="available_balance"></div>
-  <label for="destination_address">Destination Address:</label>
-  <input type="text" id="destination_address" placeholder="Destination Address" maxlength="35" />
-  <span class="isvalid_destination_address" id="isvalid_destination_address"></span>
-  <label for="amount">Amount:</label>
-  <input type="text" id="amount" placeholder="Amount" />
-  <label for="destination_tag">Destination Tag:</label>
-  <input type="text" id="destination_tag" placeholder="Destination Tag" />
-  <button class="submit_tx_button" id="submit_tx_button">Submit Transaction</button>
+<div class="send-xrp-container">
+  <div class="send-xrp-header">
+    <div class="balance-info">
+      <span id="available_balance" class="balance-text">Loading balance...</span>
+    </div>
+  </div>
+  <form class="send-xrp-form">
+    <div class="form-group">
+      <label for="destination_address">Destination Address</label>
+      <input type="text" id="destination_address" placeholder="Enter XRP address" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label for="amount">Amount (XRP)</label>
+      <input type="text" id="amount" placeholder="Enter amount" class="form-input" required>
+    </div>
+    <div class="form-group">
+      <label for="destination_tag">Destination Tag (Optional)</label>
+      <input type="text" id="destination_tag" placeholder="Enter tag" class="form-input">
+    </div>
+    <button type="button" id="submit_tx_button" class="submit-btn" disabled>Submit Transaction</button>
+  </form>
 </div>

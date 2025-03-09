@@ -1,36 +1,91 @@
-// src/styles/pages/_wallet.scss
-.wallet_details {
-    padding: $spacing-unit;
-  
-    .heading_h3 {
-      font-size: 1.3rem;
-      color: $primary-color;
+// src/styles/pages/wallet.scss
+.wallet-container {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+
+  .wallet-header {
+    backdrop-filter: blur(5px);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+
+    .wallet-title {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
-  
-    span {
-      display: block;
-      margin: $spacing-unit / 2 0;
-    }
-  
-    .view_more a {
-      color: $primary-color;
-      text-decoration: none;
+  }
+
+  .wallet-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    flex: 1;
+
+    .wallet-card, .ledger-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      transition: transform 0.2s;
+
       &:hover {
-        text-decoration: underline;
+        transform: translateY(-5px);
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        color: #2c3e50;
+        margin: 0 0 20px;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .loading {
+        text-align: center;
+        color: #7f8c8d;
+        font-size: 1rem;
+        margin: 20px 0;
+      }
+
+      .detail-item {
+        margin: 15px 0;
+        font-size: 1rem;
+        color: #7f8c8d;
+        word-break: break-word;
+
+        span {
+          display: block;
+          color: #333;
+          font-weight: 500;
+        }
+      }
+
+      .view-more-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s, transform 0.2s;
+
+        &:hover {
+          background: #0056b3;
+          transform: translateY(-2px);
+        }
       }
     }
   }
-  
-  .ledger_details {
-    padding: $spacing-unit;
-  
-    .heading_h3 {
-      font-size: 1.3rem;
-      color: $primary-color;
-    }
-  
-    span {
-      display: block;
-      margin: $spacing-unit / 2 0;
-    }
-  }
+}
