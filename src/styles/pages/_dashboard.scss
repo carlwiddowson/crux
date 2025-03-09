@@ -1,7 +1,71 @@
 // src/styles/pages/_dashboard.scss
 #dashboard-info {
     padding: $spacing-unit;
-    p {
-      font-size: 1.2rem;
+    
+    .dashboard-cards {
+      display: flex;
+      flex-wrap: wrap;
+      flex-direction: row;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s ease;
+      flex: 1 1 250px; /* Flex-grow, flex-shrink, and basis: cards grow/shrink but start at 250px */
+      max-width: 300px; 
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .card-heading {
+        font-size: 1.5rem;
+        margin: 0 0 10px;
+        color: #333;
+      }
+
+      .card-description {
+        font-size: 1rem;
+        color: #666;
+        margin: 0 0 15px;
+      }
+
+      .card-cta {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #007bff;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        transition: background 0.3s ease;
+
+        &:hover {
+          background: #0056b3;
+        }
+      }
+    }
+    .balance-chart {
+      margin-bottom: 30px;
+      text-align: center;
+    
+      .chart-heading {
+        font-size: 1.75rem;
+        color: #333;
+        margin-bottom: 15px;
+      }
+    
+      .chart-container {
+        position: relative;
+        max-width: 400px;
+        margin: 0 auto; /* Center the chart */
+        height: 300px; /* Fixed height for consistency */
+      }
     }
   }

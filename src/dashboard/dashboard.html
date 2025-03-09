@@ -1,5 +1,31 @@
 <!-- src/dashboard/dashboard.html -->
 <div id="dashboard-info">
-    <p>Welcome to your XRP Dashboard!</p>
-    
-</div>
+    <div class="dashboard-cards">
+        <div class="card">
+            <h2 class="card-heading">Wallet</h2>
+            <p class="card-description">View your XRP wallet details, balance, and reserve information.</p>
+            <a href="/wallet" class="card-cta">Go to Wallet</a>
+        </div>
+        <div class="card">
+            <h2 class="card-heading">Send XRP</h2>
+            <p class="card-description">Send XRP to any address quickly and securely.</p>
+            <a href="/send-xrp" class="card-cta">Send XRP Now</a>
+        </div>
+        <div class="card">
+            <h2 class="card-heading">Transactions</h2>
+            <p class="card-description">Check your transaction history with detailed records.</p>
+            <a href="/transaction-history" class="card-cta">View Transactions</a>
+        </div>
+        <div class="card">
+            <h2 class="card-heading">Map</h2>
+            <p class="card-description">Explore oil company locations and filter by various criteria.</p>
+            <a href="/map" class="card-cta">Explore Map</a>
+        </div>
+    </div>
+    <section class="balance-chart">
+        <h2 class="chart-heading">XRP Overview</h2>
+        <div class="chart-container">
+          <canvas id="xrp-donut-chart"></canvas>
+        </div>
+    </section>
+  </div>
