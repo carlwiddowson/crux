@@ -1,3 +1,4 @@
+// src/helpers/data.js
 const companies = [
     { name: "ExxonMobil", lat: 45.1234, lng: -93.4567, barrels: 750000, category: "Light", rating: 4, pricePerBarrel: 65 },
     { name: "Chevron", lat: 32.9876, lng: -117.5432, barrels: 1200000, category: "Medium", rating: 3, pricePerBarrel: 72 },

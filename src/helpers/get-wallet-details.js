@@ -1,3 +1,4 @@
+// src/helpers/get-wallet-details.js
 import { Client, Wallet, classicAddressToXAddress } from 'xrpl';
 
 export default async function getWalletDetails({ client }) {

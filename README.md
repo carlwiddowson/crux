@@ -2,7 +2,7 @@
 
 /crux/
 ├── src/
-│   ├── helpers/    
+│   ├── helpers/
 │   │   ├── get-wallet-details.js
 │   │   ├── submit-transaction.js
 │   │   ├── data.js             
@@ -21,7 +21,7 @@
 │   ├── transaction-history/
 │   │   ├── transaction-history.html
 │   │   ├── transaction-history.js
-│   ├── styles/    
+│   ├── styles/
 │   │   ├── main.scss
 │   │   ├── abstracts/
 |   |   |   ├── mixins.scss
@@ -40,10 +40,10 @@
 |   |   |   ├── send-xrp.scss
 |   |   |   ├── transaction-history.scss
 |   |   |   ├── wallet.scss
-├── assets
-├── index.html                  
-├── index.js                    
-├── index.css                   
+├── assets/
+├── index.html
+├── index.js
+├── index.css
 ├── vite.config.js
 ├── package.json
-├── .env                        
+├── .env
