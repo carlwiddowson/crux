@@ -7,16 +7,24 @@
     <option value="Medium">Medium</option>
     <option value="Heavy">Heavy</option>
   </select>
-  <div class="star-rating" id="star-rating"></div>
+  <div class="star-rating-container">
+    <div class="star-rating" id="star-rating"></div>
+    <span id="rating-value" class="rating-label">All</span>
+  </div>
   <div class="barrels-container">
     <label>Barrels: </label>
-    <input type="range" id="barrels-slider" min="0" max="1000000" value="1000000" step="50000" style="width: 200px;" />
-    <span id="barrels-value">1.0M</span>
+    <div class="row">
+      <input type="range" id="barrels-slider" min="0" max="1000000" value="1000000" step="50000" style="width: 200px;" />
+      <span id="barrels-value">1.0M</span>
+    </div>
   </div>
   <div class="price-container">
     <label>Price/Barrel: $</label>
-    <input type="range" id="price-slider" min="45" max="92" value="92" step="1" style="width: 200px;" />
-    <span id="price-value">$92</span>
+    <div class="row">
+      <input type="range" id="price-slider" min="45" max="92" value="92" step="1" style="width: 200px;" />
+      <span id="price-value">$92</span>
+    </div>
   </div>
+  <button id="clear-filters" class="filter-btn">Clear Filters</button>
   <span class="no-results" id="no-results"></span>
 </div>

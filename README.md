@@ -2,6 +2,13 @@
 
 /crux/
 ├── src/
+│   ├── delivery-status/
+│   │   ├── delivery-status.html
+│   │   ├── delivery-status.js
+│   ├── escrow-payments/
+│   │   ├── escrow-payments.html
+│   │   ├── escrow-payments.js
+│   │   ├── data.js   
 │   ├── helpers/
 │   │   ├── xrpl-client.js
 │   │   ├── get-wallet-details.js
@@ -37,6 +44,7 @@
 |   |   |   ├── layout.scss
 │   │   ├── pages/
 |   |   |   ├── dashboard.scss
+|   |   |   ├── delivery-status.scss
 |   |   |   ├── map.scss
 |   |   |   ├── send-xrp.scss
 |   |   |   ├── transaction-history.scss

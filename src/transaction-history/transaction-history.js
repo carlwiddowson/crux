@@ -1,5 +1,5 @@
 // src/transaction-history/transaction-history.js
-import { Wallet, convertHexToString, dropsToXrp } from 'xrpl';
+import { Wallet, convertHexToString, dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
 
@@ -29,8 +29,40 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
     const { result } = await client.request(payload);
     const { transactions, marker: nextMarker } = result;
 
+    // Load escrow payments from localStorage to get notes, release dates, and escrow amounts
+    const escrowPayments = JSON.parse(localStorage.getItem('escrowPayments')) || [];
+
     const values = transactions.map((transaction) => {
-      const { hash, meta, tx_json } = transaction;
+      const { hash, meta, tx_json, date } = transaction;
+      
+      // Debug raw date and conversion
+      console.log('Raw date:', date);
+      const createdDateTime = date ? rippleTimeToISOTime(date) : '-';
+      console.log('Converted createdDateTime:', createdDateTime);
+
+      // Validate and format the date
+      const parsedDate = createdDateTime !== '-' ? new Date(createdDateTime) : null;
+      const formattedDateTime = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.toLocaleString() : '-';
+
+      // Check if this transaction is an escrow-related one
+      const isEscrowCreate = tx_json.TransactionType === 'EscrowCreate';
+      const isEscrowFinish = tx_json.TransactionType === 'EscrowFinish';
+
+      let note = '-';
+      let releaseDateTime = '-';
+      let amountInEscrow = '-';
+
+      if (isEscrowCreate) {
+        const escrow = escrowPayments.find(e => e.sequence === tx_json.Sequence);
+        note = escrow?.note || 'No note';
+        amountInEscrow = escrow?.amount || dropsToXrp(tx_json.Amount) || '-'; // Use local amount or transaction amount
+      } else if (isEscrowFinish) {
+        const escrow = escrowPayments.find(e => e.sequence === tx_json.OfferSequence);
+        note = escrow?.note || 'No note';
+        releaseDateTime = escrow?.releaseDate ? new Date(escrow.releaseDate).toLocaleString() : '-';
+        amountInEscrow = escrow?.amount || '-'; // Use the original amount, assuming it's released
+      }
+
       return {
         Account: tx_json.Account,
         Destination: tx_json.Destination,
@@ -39,14 +71,18 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
         TransactionType: tx_json.TransactionType,
         result: meta?.TransactionResult,
         delivered: meta?.delivered_amount,
+        note: note,
+        createdDateTime: formattedDateTime,
+        releaseDateTime: releaseDateTime,
+        amountInEscrow: amountInEscrow,
       };
     });
 
     loadMore.style.display = nextMarker ? 'inline-block' : 'none';
 
-    if (values.length === 0 && !marker) { // Only show "No transactions" on initial load
+    if (values.length === 0 && !marker) {
       const row = document.createElement('tr');
-      row.innerHTML = `<td colspan="7" class="no-data">No transactions found</td>`;
+      row.innerHTML = `<td colspan="11" class="no-data">No transactions found</td>`; // Updated colspan to 11
       txHistoryElement.appendChild(row);
     } else {
       values.forEach((value) => {
@@ -57,6 +93,10 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
           <td>${value.Fee ? dropsToXrp(value.Fee) : '-'}</td>
           <td>${renderAmount(value.delivered)}</td>
           <td>${value.TransactionType || '-'}</td>
+          <td>${value.note}</td>
+          <td>${value.createdDateTime}</td>
+          <td>${value.releaseDateTime}</td>
+          <td>${value.amountInEscrow}</td>
           <td>${value.result || '-'}</td>
           <td><a href="https://${process.env.EXPLORER_NETWORK}.xrpl.org/transactions/${value.Hash}" target="_blank" class="view-link">View</a></td>
         `;
@@ -104,44 +144,25 @@ function renderAmount(delivered) {
 }
 
 function initTransactionHistory() {
-  const txHistoryElement = document.getElementById('tx_history_data');
-  const loadMore = document.getElementById('load_more_button');
+  const txHistoryElement = document.querySelector('#tx_history_data tbody');
+  const loadMore = document.querySelector('#load_more_button');
 
-  console.log('Tx history element:', txHistoryElement); // Debug
-  console.log('Load more button:', loadMore); // Debug
+  console.log('Tx history element:', txHistoryElement);
+  console.log('Load more button:', loadMore);
 
   if (!txHistoryElement || !loadMore) {
     console.error('Required DOM elements not found');
     return;
   }
 
-  // Add table header
-  const header = document.createElement('thead');
-  header.innerHTML = `
-    <tr>
-      <th>Account</th>
-      <th>Destination</th>
-      <th>Fee (XRP)</th>
-      <th>Amount Delivered</th>
-      <th>Transaction Type</th>
-      <th>Result</th>
-      <th>Link</th>
-    </tr>
-  `;
-  txHistoryElement.appendChild(header);
-
-  // Create tbody for dynamic content
-  const tbody = document.createElement('tbody');
-  txHistoryElement.appendChild(tbody);
-
   async function renderTxHistory() {
-    marker = await fetchTxHistory(tbody, loadMore);
-    loadMore.removeEventListener('click', loadMoreHandler); // Prevent duplicates
+    marker = await fetchTxHistory(txHistoryElement, loadMore);
+    loadMore.removeEventListener('click', loadMoreHandler);
     loadMore.addEventListener('click', loadMoreHandler);
   }
 
   async function loadMoreHandler() {
-    const nextMarker = await fetchTxHistory(tbody, loadMore);
+    const nextMarker = await fetchTxHistory(txHistoryElement, loadMore);
     marker = nextMarker;
   }
 

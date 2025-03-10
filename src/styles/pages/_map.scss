@@ -1,44 +1,122 @@
 // src/styles/pages/_map.scss
-  #map {
-    margin: 0 0 0 0;
-    height: 400px;
-    width: 100%;
-  }
-  .filter-container {
-    width: 300px;
-    position: relative;
-    z-index: 1000;
-    margin-top: 40px;
-    margin-right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  .barrels-container,
-  .price-container {
-    display: flex;
-  }
-  span.no-results {
-    display: block;
-    font-size: 14px;
-    color: #333;
-  }
+#map {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+  
   .leaflet-control-attribution.leaflet-control {
     display: none;
   }
-  .star-rating {
+}
+.filter-container {
+  width: 300px;
+  position: absolute; // Changed to absolute to float over map
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  select, input[type="range"] {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    width: 100%;
+    transition: border-color 0.3s;
+
+    &:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+  }
+  .star-rating-container {
     display: flex;
-    gap: 5px;
+    align-items: center;
+    gap: 10px;
+
+    .star-rating {
+      display: flex;
+      gap: 5px;
+    
+      .star {
+        cursor: pointer;
+        color: #ccc; /* Inactive color */
+        transition: color 0.3s;
+      
+        &:hover svg,
+        &.active svg {
+          fill: #ffd700; /* Active color (gold) */
+          stroke: #ffd700;
+        }
+      
+        svg {
+          vertical-align: middle;
+        }
+      }
+    }
+    .rating-label {
+      padding-top: 4px;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
   }
-  .star {
+  
+  .barrels-container,
+  .price-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  
+    label {
+      width: 100%;
+      display: block;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  }
+  
+  #barrels-value,
+  #price-value {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+  }
+  
+  span.no-results {
+    display: block;
+    font-size: 14px;
+    color: #e74c3c;
+    text-align: center;
+  }
+  
+  .filter-btn {
+    padding: 8px 15px;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
     cursor: pointer;
-    color: #000; /* Inactive color */
+    transition: background 0.3s;
+  
+    &:hover {
+      background: #0056b3;
+    }
   }
-  .star:hover svg, 
-  .star.active svg {
-    fill: #ffd700; /* Active color (gold) */
-    stroke: #ffd700;
-  }
+  
   label {
     font-weight: bold;
+    font-size: 0.9rem;
+    color: #2c3e50;
   }
+}

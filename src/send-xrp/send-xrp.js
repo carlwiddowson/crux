@@ -17,9 +17,10 @@ async function initSendXrp() {
   const submitTxBtn = document.querySelector('#submit_tx_button');
   const availableBalanceElement = document.querySelector('#available_balance');
 
-  console.log('Destination address:', destinationAddress); // Debug
-  console.log('Amount:', amount); // Debug
-  console.log('Submit button:', submitTxBtn); // Debug
+  console.log('Destination address:', destinationAddress);
+  console.log('Amount:', amount);
+  console.log('Submit button:', submitTxBtn);
+  console.log('Balance element:', availableBalanceElement);
 
   if (!destinationAddress || !amount || !submitTxBtn || !availableBalanceElement) {
     console.error('Required DOM elements not found');
@@ -36,7 +37,9 @@ async function initSendXrp() {
 
     const updateBalance = async () => {
       const { accountReserves, account_data } = await getWalletDetails({ client });
-      availableBalanceElement.textContent = `Available Balance: ${dropsToXrp(account_data.Balance) - accountReserves} XRP`;
+      const availableBalance = dropsToXrp(account_data.Balance) - accountReserves;
+      availableBalanceElement.textContent = `Available Balance: ${availableBalance} XRP`;
+      console.log('Available balance:', availableBalance); // Debug balance
     };
     await updateBalance();
 
@@ -69,8 +72,11 @@ async function initSendXrp() {
 
     function updateButtonState() {
       const values = allInputs.map(v => v.value.trim());
-      submitTxBtn.disabled = !isValidDestinationAddress || values.includes('');
-      console.log('Button state:', { values, isValidDestinationAddress, disabled: submitTxBtn.disabled });
+      const amountValue = parseFloat(amount.value) || 0;
+      const availableBalance = parseFloat(availableBalanceElement.textContent.split(' ')[2]) || 0;
+      const isValidAmount = amountValue > 0 && amountValue <= availableBalance;
+      submitTxBtn.disabled = !isValidDestinationAddress || values.includes('') || !isValidAmount;
+      console.log('Button state:', { values, isValidDestinationAddress, amountValue, availableBalance, disabled: submitTxBtn.disabled });
     }
 
     allInputs.forEach(input => {
@@ -85,27 +91,40 @@ async function initSendXrp() {
         submitTxBtn.disabled = true;
         submitTxBtn.textContent = 'Submitting...';
 
+        const amountValue = parseFloat(amount.value);
+        if (isNaN(amountValue) || amountValue <= 0) {
+          throw new Error('Invalid amount');
+        }
+
         const txJson = {
           TransactionType: 'Payment',
           Amount: xrpToDrops(amount.value),
           Destination: destinationAddress.value,
         };
 
-        if (destinationTag?.value !== '') {
-          txJson.DestinationTag = destinationTag.value;
+        if (destinationTag?.value.trim() !== '') {
+          txJson.DestinationTag = parseInt(destinationTag.value.trim());
         }
+
+        console.log('Submitting transaction:', txJson); // Debug transaction details
 
         const { result } = await submitTransaction({ client, tx: txJson });
         const txResult = result?.meta?.TransactionResult || result?.engine_result || '';
 
+        console.log('Transaction result:', result); // Debug full response
+
         if (txResult === 'tesSUCCESS') {
           alert('Transaction submitted successfully!');
+          destinationAddress.value = '';
+          amount.value = '';
+          destinationTag.value = '';
+          updateBalance();
         } else {
-          throw new Error(txResult);
+          throw new Error(`Transaction failed: ${txResult}`);
         }
       } catch (error) {
         alert('Error submitting transaction. Please try again.');
-        console.error(error);
+        console.error('Send XRP Error:', error.message, error);
       } finally {
         submitTxBtn.disabled = false;
         submitTxBtn.textContent = 'Submit Transaction';

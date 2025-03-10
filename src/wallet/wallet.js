@@ -1,5 +1,5 @@
 // src/wallet/wallet.js
-import { dropsToXrp, rippleTimeToISOTime } from 'xrpl';
+import { Wallet, dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
 import getWalletDetails from '../helpers/get-wallet-details.js';
@@ -15,8 +15,8 @@ async function initWallet() {
   const ledgerLoadingDiv = document.querySelector('#loading_ledger_details');
   const viewMoreBtn = document.querySelector('#view_more_button');
 
-  console.log('Wallet element:', walletElement); // Debug
-  console.log('View more button:', viewMoreBtn); // Debug
+  // console.log('Form elements:', { walletElement, viewMoreBtn });
+  // console.log('Client connected:', await client.isConnected());
 
   if (!walletElement || !walletLoadingDiv || !ledgerLoadingDiv || !viewMoreBtn) {
     console.error('Required DOM elements not found');
@@ -24,10 +24,14 @@ async function initWallet() {
   }
 
   try {
+    // console.log('Using seed:', process.env.SEED);
+    const wallet = Wallet.fromSeed(process.env.SEED);
+    // console.log('Wallet address:', wallet.address);
+
     await client.request({ command: 'subscribe', streams: ['ledger'] });
 
     getWalletDetails({ client })
-      .then(({ account_data, accountReserves, xAddress, address }) => {
+      .then(({ accountReserves, account_data, xAddress, address }) => {
         walletElement.querySelector('.wallet-address span').textContent = account_data.Account;
         walletElement.querySelector('.wallet-balance span').textContent = `${dropsToXrp(account_data.Balance)} XRP`;
         walletElement.querySelector('.wallet-reserve span').textContent = `${accountReserves} XRP`;
@@ -49,7 +53,7 @@ async function initWallet() {
     }, pageKey);
 
   } catch (error) {
-    console.error('Wallet JS Error:', error);
+    // console.error('Wallet JS Error:', error);
     walletLoadingDiv.textContent = 'Error loading wallet details';
     ledgerLoadingDiv.textContent = 'Error loading ledger details';
   }
