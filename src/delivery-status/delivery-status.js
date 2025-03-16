@@ -9,17 +9,18 @@ function initDeliveryStatus() {
   const keywordSearch = document.getElementById('keyword-search');
   const fromDate = document.getElementById('from-date');
   const toDate = document.getElementById('to-date');
+  const statusSelect = document.getElementById('status-select');
   const prevPageBtn = document.getElementById('prev-page');
   const nextPageBtn = document.getElementById('next-page');
   const pageInfo = document.getElementById('page-info');
 
-  if (!tableBody || !keywordSearch || !fromDate || !toDate || !prevPageBtn || !nextPageBtn || !pageInfo) {
+  if (!tableBody || !keywordSearch || !fromDate || !toDate || !statusSelect || !prevPageBtn || !nextPageBtn || !pageInfo) {
     console.error('Required DOM elements not found');
     return;
   }
 
   let currentPage = 1;
-  const recordsPerPage = 10; // Changed from 15 to 10
+  const recordsPerPage = 10;
   let sortColumn = null;
   let sortDirection = 'asc'; // 'asc' or 'desc'
 
@@ -40,6 +41,12 @@ function initDeliveryStatus() {
     }
     if (to) {
       filtered = filtered.filter(d => new Date(d.deliveryDate) <= to);
+    }
+
+    // Status filter
+    const status = statusSelect.value;
+    if (status) {
+      filtered = filtered.filter(d => d.status === status);
     }
 
     return filtered;
@@ -173,6 +180,7 @@ function initDeliveryStatus() {
   keywordSearch.addEventListener('input', () => renderTable(1));
   fromDate.addEventListener('change', () => renderTable(1));
   toDate.addEventListener('change', () => renderTable(1));
+  statusSelect.addEventListener('change', () => renderTable(1));
   prevPageBtn.addEventListener('click', () => renderTable(currentPage - 1));
   nextPageBtn.addEventListener('click', () => renderTable(currentPage + 1));
 

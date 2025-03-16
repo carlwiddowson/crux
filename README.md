@@ -56,3 +56,7 @@
 ├── vite.config.js
 ├── package.json
 ├── .env
+
+
+
+I want to create a couple of pages where a buyer and initial the purchase of N 

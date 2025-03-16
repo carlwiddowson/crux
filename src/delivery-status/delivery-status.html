@@ -2,6 +2,16 @@
 <div class="delivery-status-container">
   <div class="filters">
     <input type="text" id="keyword-search" placeholder="Search by company..." class="search-input">
+    <div class="status-filter">
+      <label for="status-select">Status:</label>
+      <select id="status-select" class="status-select">
+        <option value="">All</option>
+        <option value="In-transit">In-transit</option>
+        <option value="Cancelled">Cancelled</option>
+        <option value="Pending">Pending</option>
+        <option value="Delivered">Delivered</option>
+      </select>
+    </div>
     <div class="date-filters">
       <label for="from-date">From:</label>
       <input type="date" id="from-date" class="date-input">

@@ -1,4 +1,3 @@
-// src/transaction-history/transaction-history.js
 import { Wallet, convertHexToString, dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
@@ -29,12 +28,9 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
     const { result } = await client.request(payload);
     const { transactions, marker: nextMarker } = result;
 
-    // Load escrow payments from localStorage to get notes, release dates, and escrow amounts
-    const escrowPayments = JSON.parse(localStorage.getItem('escrowPayments')) || [];
-
     const values = transactions.map((transaction) => {
       const { hash, meta, tx_json, date } = transaction;
-      
+
       // Debug raw date and conversion
       console.log('Raw date:', date);
       const createdDateTime = date ? rippleTimeToISOTime(date) : '-';
@@ -44,37 +40,42 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
       const parsedDate = createdDateTime !== '-' ? new Date(createdDateTime) : null;
       const formattedDateTime = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate.toLocaleString() : '-';
 
-      // Check if this transaction is an escrow-related one
-      const isEscrowCreate = tx_json.TransactionType === 'EscrowCreate';
-      const isEscrowFinish = tx_json.TransactionType === 'EscrowFinish';
-
+      // Handle escrow-related transactions
       let note = '-';
       let releaseDateTime = '-';
       let amountInEscrow = '-';
 
-      if (isEscrowCreate) {
-        const escrow = escrowPayments.find(e => e.sequence === tx_json.Sequence);
-        note = escrow?.note || 'No note';
-        amountInEscrow = escrow?.amount || dropsToXrp(tx_json.Amount) || '-'; // Use local amount or transaction amount
-      } else if (isEscrowFinish) {
-        const escrow = escrowPayments.find(e => e.sequence === tx_json.OfferSequence);
-        note = escrow?.note || 'No note';
-        releaseDateTime = escrow?.releaseDate ? new Date(escrow.releaseDate).toLocaleString() : '-';
-        amountInEscrow = escrow?.amount || '-'; // Use the original amount, assuming it's released
+      if (tx_json.TransactionType === 'EscrowCreate') {
+        // Extract note from memo if present
+        const memo = tx_json.Memos?.[0]?.Memo;
+        note = memo?.MemoData ? Buffer.from(memo.MemoData, 'hex').toString('utf8') : 'No note';
+        amountInEscrow = dropsToXrp(tx_json.Amount) || '-';
+      } else if (tx_json.TransactionType === 'EscrowFinish') {
+        // Find the corresponding EscrowCreate transaction in the same result set
+        const escrowCreateTx = transactions.find(t => t.tx_json.Sequence === tx_json.OfferSequence);
+        if (escrowCreateTx) {
+          const memo = escrowCreateTx.tx_json.Memos?.[0]?.Memo;
+          note = memo?.MemoData ? Buffer.from(memo.MemoData, 'hex').toString('utf8') : 'No note';
+          amountInEscrow = dropsToXrp(escrowCreateTx.tx_json.Amount) || '-';
+        } else {
+          note = 'No note (EscrowCreate not in current page)';
+          amountInEscrow = 'Unknown';
+        }
+        releaseDateTime = date ? rippleTimeToISOTime(date).toLocaleString() : '-';
       }
 
       return {
-        Account: tx_json.Account,
-        Destination: tx_json.Destination,
-        Fee: tx_json.Fee,
+        Account: tx_json.Account || '-',
+        Destination: tx_json.Destination || '-',
+        Fee: tx_json.Fee ? dropsToXrp(tx_json.Fee) : '-',
         Hash: hash,
-        TransactionType: tx_json.TransactionType,
-        result: meta?.TransactionResult,
+        TransactionType: tx_json.TransactionType || '-',
+        result: meta?.TransactionResult || '-',
         delivered: meta?.delivered_amount,
-        note: note,
+        note,
         createdDateTime: formattedDateTime,
-        releaseDateTime: releaseDateTime,
-        amountInEscrow: amountInEscrow,
+        releaseDateTime,
+        amountInEscrow,
       };
     });
 
@@ -82,22 +83,22 @@ async function fetchTxHistory(txHistoryElement, loadMore) {
 
     if (values.length === 0 && !marker) {
       const row = document.createElement('tr');
-      row.innerHTML = `<td colspan="11" class="no-data">No transactions found</td>`; // Updated colspan to 11
+      row.innerHTML = `<td colspan="11" class="no-data">No transactions found</td>`;
       txHistoryElement.appendChild(row);
     } else {
       values.forEach((value) => {
         const row = document.createElement('tr');
         row.innerHTML = `
-          <td>${value.Account || '-'}</td>
-          <td>${value.Destination || '-'}</td>
-          <td>${value.Fee ? dropsToXrp(value.Fee) : '-'}</td>
+          <td>${value.Account}</td>
+          <td>${value.Destination}</td>
+          <td>${value.Fee}</td>
           <td>${renderAmount(value.delivered)}</td>
-          <td>${value.TransactionType || '-'}</td>
+          <td>${value.TransactionType}</td>
           <td>${value.note}</td>
           <td>${value.createdDateTime}</td>
           <td>${value.releaseDateTime}</td>
           <td>${value.amountInEscrow}</td>
-          <td>${value.result || '-'}</td>
+          <td>${value.result}</td>
           <td><a href="https://${process.env.EXPLORER_NETWORK}.xrpl.org/transactions/${value.Hash}" target="_blank" class="view-link">View</a></td>
         `;
         txHistoryElement.appendChild(row);

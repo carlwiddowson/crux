@@ -24,6 +24,8 @@
     "dotenv": "^16.0.3",
     "leaflet": "^1.9.4",
     "vite": "^6.2.0",
-    "xrpl": "^4.0.0"
+    "xrpl": "^4.0.0",
+    "five-bells-condition": "^5.0.1",
+    "dayjs": "^1.11.10"
   }
 }
