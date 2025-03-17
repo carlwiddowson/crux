@@ -1,0 +1,33 @@
+<div class="seller-escrows-container">
+    <h2>Received Escrows</h2>
+    <style>
+    .success-message {
+      color: green;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .error-message {
+      color: red;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    </style>
+    <div id="message_container"></div>
+    <div class="escrow-table-wrapper">
+      <table id="seller_escrows_table" class="escrow-table">
+        <thead>
+          <tr>
+            <th>From Address</th>
+            <th>Amount</th>
+            <th>Ledger Index</th>
+            <th>Created</th>
+            <th>Status</th>
+            <th>Preimage</th>
+            <th>Actions</th>
+            <th>Ledger Link</th>
+          </tr>
+        </thead>
+        <tbody id="seller_escrows_table_body"></tbody>
+      </table>
+    </div>
+  </div>

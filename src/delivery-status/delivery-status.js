@@ -1,4 +1,3 @@
-// src/delivery-status/delivery-status.js
 import { setPageTitle } from '/index.js';
 import { deliveries } from '../helpers/data.js';
 
@@ -25,7 +24,7 @@ function initDeliveryStatus() {
   let sortDirection = 'asc'; // 'asc' or 'desc'
 
   function filterDeliveries() {
-    let filtered = [...deliveries]; // Clone to avoid mutating original
+    let filtered = [...deliveries];
 
     // Keyword search
     const keyword = keywordSearch.value.trim().toLowerCase();
@@ -114,6 +113,14 @@ function initDeliveryStatus() {
         'Delivered': 'green'
       }[delivery.status] || 'gray';
 
+      // Extract city names from "from" and "to" (e.g., "Houston, TX" -> "Houston")
+      const fromCity = delivery.from.split(',')[0].trim();
+      const toCity = delivery.to.split(',')[0].trim();
+
+      // Create weather search links for start and end locations
+      const weatherStartLink = `https://www.google.com/search?q=weather+${encodeURIComponent(fromCity)}`;
+      const weatherEndLink = `https://www.google.com/search?q=weather+${encodeURIComponent(toCity)}`;
+
       row.innerHTML = `
         <td>${delivery.company}</td>
         <td>${delivery.from}</td>
@@ -124,6 +131,10 @@ function initDeliveryStatus() {
           </div>
         </td>
         <td><span class="status" style="color: ${statusColor};">${delivery.status}</span></td>
+        <td class="weather-links">
+          <a href="${weatherStartLink}" target="_blank" class="weather-link">Start</a>
+          <a href="${weatherEndLink}" target="_blank" class="weather-link">End</a>
+        </td>
         <td>${delivery.deliveryDate}</td>
         <td>
           <div class="action-dropdown">
@@ -161,7 +172,7 @@ function initDeliveryStatus() {
 
   // Add sort functionality to column headers
   document.querySelectorAll('.delivery-table th').forEach(th => {
-    if (th.dataset.column) { // Only sortable columns have data-column
+    if (th.dataset.column) {
       th.style.cursor = 'pointer';
       th.addEventListener('click', () => {
         const column = th.dataset.column;

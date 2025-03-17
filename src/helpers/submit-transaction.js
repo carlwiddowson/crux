@@ -1,19 +1,19 @@
-// src/helpers/submit-transaction.js
 import { Wallet } from 'xrpl';
 
 export default async function submitTransaction({ client, tx }) {
-    try {
-        // Create a wallet using the seed
-        const wallet = await Wallet.fromSeed(process.env.SEED);
-        tx.Account = wallet.address;
-
-        // Sign and submit the transaction : https://xrpl.org/send-xrp.html#send-xrp
-        const response = await client.submit(tx, { wallet });
-        console.log(response);
-
-        return response;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
+  try {
+    const wallet = await Wallet.fromSeed(process.env.SEED);
+    tx.Account = wallet.address;
+    console.log('Submitting transaction with details:', tx); // Debug
+    const response = await client.submit(tx, { wallet });
+    console.log('Transaction Response:', response);
+    return response;
+  } catch (error) {
+    console.error('Transaction Submission Error:', {
+      message: error.message,
+      stack: error.stack,
+      tx: tx, // Log the transaction details
+    });
+    return null;
+  }
 }
