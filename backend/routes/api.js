@@ -1,4 +1,6 @@
 const express = require('express');
+const pool = require('../config/db');
+const bcrypt = require('bcrypt'); // Add bcrypt
 const router = express.Router();
 
 // Import models
@@ -61,6 +63,51 @@ router.post('/users', async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     console.error('Error creating user:', error.message);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Register (updated to hash password)
+router.post('/register', async (req, res) => {
+  const { organization, user, emailDomain } = req.body;
+
+  try {
+    // Step 1: Create the organization
+    console.log('Creating organization:', organization);
+    const newOrganization = await Organization.create({
+      name: organization.name,
+      buyer_type: organization.buyer_type,
+      email: organization.email,
+    });
+    console.log('Created organization:', newOrganization);
+
+    // Step 2: Save the email domain to organization_required_email_domain
+    const emailDomainQuery = `
+      INSERT INTO organization_required_email_domain (email_domain, organization_id)
+      VALUES ($1, $2)
+      RETURNING *;
+    `;
+    const emailDomainValues = [emailDomain, newOrganization.organization_id];
+    const emailDomainResult = await pool.query(emailDomainQuery, emailDomainValues);
+    console.log('Created email domain entry:', emailDomainResult.rows[0]);
+
+    // Step 3: Hash the password
+    const saltRounds = 10; // Number of salt rounds for bcrypt
+    const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+    console.log('Hashed password:', hashedPassword);
+
+    // Step 4: Create the user with the hashed password and organization ID
+    const newUser = await User.create({
+      ...user,
+      password: hashedPassword, // Use the hashed password
+      organization_id: newOrganization.organization_id,
+    });
+    console.log('Created user:', newUser);
+
+    res.status(201).json({ organization: newOrganization, user: newUser });
+  } catch (error) {
+    console.error('Error during registration:', error.message);
     console.error('Error stack:', error.stack);
     res.status(500).json({ error: error.message });
   }
