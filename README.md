@@ -57,6 +57,18 @@
 ├── package.json
 ├── .env
 
+/crux/
+├── backend/                # New backend folder for PostgreSQL integration
+│   ├── config/             # Configuration files
+│   │   └── db.js           # Database connection setup
+│   ├── routes/             # API route handlers
+│   │   └── api.js          # API endpoints (e.g., /deliveries, /transactions)
+│   ├── models/             # Database models (schema definitions)
+│   │   └── delivery.js     # Model for deliveries table
+│   ├── package.json        # Backend dependencies (e.g., express, pg)
+│   ├── server.js           # Main backend server file
+│   └── .env                # Environment variables (e.g., database credentials)
+
 
 Escrow:
 - To
@@ -67,5 +79,3 @@ Escrow:
     - Enter the fulfillment key to execute payment
     - Escrow is closed out when key is entered
     - There will be a 15 day grace period to close out
-
-I want to create a couple of pages between a buyer and seller. The buyer can initiate the purchase of N the purchase can just be the amount of XRP and the address for the seller. When the purchase is made a escrow condition is created and all created escrows should show in a datagrid below. For each record the: to address, amount of XRP, XRP transaction fee, condition, fulfillment, date created, status: 'created' || 'closed out' || 'cancelled'. On the seller page they have a datagrid of the escrows sent to them the data datagrid should have: from address, amount of xrp, status, a field to enter the fulfillment key, a submit || cancel. The seller grid should show all cancelled, closed out, created. If it is cancelled or closed out the fulfillment field and submit button are disabled. These pages should use the ledger and not local storage.

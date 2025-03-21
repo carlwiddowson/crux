@@ -1,7 +1,23 @@
 import { setPageTitle } from '/index.js';
-import { deliveries } from '../helpers/data.js';
 
 setPageTitle('Delivery Status');
+
+async function fetchDeliveries() {
+  try {
+    console.log('Fetching deliveries from http://localhost:5001/api/deliveries');
+    const response = await fetch('http://localhost:5001/api/deliveries');
+    if (!response.ok) {
+      console.error('Response not OK:', response.status, response.statusText);
+      throw new Error('Failed to fetch deliveries');
+    }
+    const data = await response.json();
+    console.log('Fetched deliveries:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching deliveries:', error);
+    return [];
+  }
+}
 
 function initDeliveryStatus() {
   const tableBody = document.getElementById('delivery-table-body');
@@ -23,8 +39,10 @@ function initDeliveryStatus() {
   let sortColumn = null;
   let sortDirection = 'asc'; // 'asc' or 'desc'
 
-  function filterDeliveries() {
-    let filtered = [...deliveries];
+  async function filterDeliveries() {
+    let filtered = await fetchDeliveries(); // Fetch from API
+
+    console.log('Filtered deliveries before applying filters:', filtered);
 
     // Keyword search
     const keyword = keywordSearch.value.trim().toLowerCase();
@@ -36,10 +54,10 @@ function initDeliveryStatus() {
     const from = fromDate.value ? new Date(fromDate.value) : null;
     const to = toDate.value ? new Date(toDate.value) : null;
     if (from) {
-      filtered = filtered.filter(d => new Date(d.deliveryDate) >= from);
+      filtered = filtered.filter(d => new Date(d.delivery_date) >= from);
     }
     if (to) {
-      filtered = filtered.filter(d => new Date(d.deliveryDate) <= to);
+      filtered = filtered.filter(d => new Date(d.delivery_date) <= to);
     }
 
     // Status filter
@@ -48,6 +66,7 @@ function initDeliveryStatus() {
       filtered = filtered.filter(d => d.status === status);
     }
 
+    console.log('Filtered deliveries after applying filters:', filtered);
     return filtered;
   }
 
@@ -60,12 +79,12 @@ function initDeliveryStatus() {
           valB = b.company.toLowerCase();
           break;
         case 'from':
-          valA = a.from.toLowerCase();
-          valB = b.from.toLowerCase();
+          valA = a.from_location.toLowerCase();
+          valB = b.from_location.toLowerCase();
           break;
         case 'to':
-          valA = a.to.toLowerCase();
-          valB = b.to.toLowerCase();
+          valA = a.to_location.toLowerCase();
+          valB = b.to_location.toLowerCase();
           break;
         case 'progress':
           valA = a.completion;
@@ -76,8 +95,8 @@ function initDeliveryStatus() {
           valB = b.status.toLowerCase();
           break;
         case 'deliveryDate':
-          valA = new Date(a.deliveryDate);
-          valB = new Date(b.deliveryDate);
+          valA = new Date(a.delivery_date);
+          valB = new Date(b.delivery_date);
           break;
         default:
           return 0;
@@ -89,11 +108,13 @@ function initDeliveryStatus() {
     });
   }
 
-  function renderTable(page) {
-    let filteredDeliveries = filterDeliveries();
+  async function renderTable(page) {
+    let filteredDeliveries = await filterDeliveries();
     if (sortColumn) {
       filteredDeliveries = sortDeliveries(filteredDeliveries, sortColumn);
     }
+
+    console.log('Filtered deliveries for rendering:', filteredDeliveries);
 
     const totalRecords = filteredDeliveries.length;
     const totalPages = Math.ceil(totalRecords / recordsPerPage);
@@ -102,6 +123,8 @@ function initDeliveryStatus() {
     const start = (currentPage - 1) * recordsPerPage;
     const end = Math.min(start + recordsPerPage, totalRecords);
     const paginated = filteredDeliveries.slice(start, end);
+
+    console.log('Paginated deliveries:', paginated);
 
     tableBody.innerHTML = '';
     paginated.forEach(delivery => {
@@ -113,9 +136,9 @@ function initDeliveryStatus() {
         'Delivered': 'green'
       }[delivery.status] || 'gray';
 
-      // Extract city names from "from" and "to" (e.g., "Houston, TX" -> "Houston")
-      const fromCity = delivery.from.split(',')[0].trim();
-      const toCity = delivery.to.split(',')[0].trim();
+      // Extract city names from "from_location" and "to_location"
+      const fromCity = delivery.from_location.split(',')[0].trim();
+      const toCity = delivery.to_location.split(',')[0].trim();
 
       // Create weather search links for start and end locations
       const weatherStartLink = `https://www.google.com/search?q=weather+${encodeURIComponent(fromCity)}`;
@@ -123,8 +146,8 @@ function initDeliveryStatus() {
 
       row.innerHTML = `
         <td>${delivery.company}</td>
-        <td>${delivery.from}</td>
-        <td>${delivery.to}</td>
+        <td>${delivery.from_location}</td>
+        <td>${delivery.to_location}</td>
         <td>
           <div class="progress-bar">
             <div class="progress" style="width: ${delivery.completion}%; background-color: ${statusColor};"></div>
@@ -135,7 +158,7 @@ function initDeliveryStatus() {
           <a href="${weatherStartLink}" target="_blank" class="weather-link">Start</a>
           <a href="${weatherEndLink}" target="_blank" class="weather-link">End</a>
         </td>
-        <td>${delivery.deliveryDate}</td>
+        <td>${delivery.delivery_date}</td>
         <td>
           <div class="action-dropdown">
             <button class="more-btn">...</button>
