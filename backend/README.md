@@ -4,7 +4,23 @@
 │   ├── routes/             # API route handlers
 │   │   └── api.js          # API endpoints (e.g., /deliveries, /transactions)
 │   ├── models/             # Database models (schema definitions)
-│   │   └── delivery.js     # Model for deliveries table
+│   │   └── ads.js          # Model for ads table
+│   │   └── branding.js     # Model for branding table
+│   │   └── deliveries.js   # Model for deliveries table
+│   │   └── favorites.js    # Model for favorites table
+│   │   └── group.js        # Model for group table
+│   │   └── history.js      # Model for history table
+│   │   └── inventory.js    # Model for inventory table
+│   │   └── locations.js    # Model for locations table
+│   │   └── login_history.js # Model for login_history table
+│   │   └── messaging.js    # Model for messaging table
+│   │   └── organization.js # Model for organization table
+│   │   └── permissions.js  # Model for permissions table
+│   │   └── rating.js       # Model for rating table
+│   │   └── status.js       # Model for status table
+│   │   └── transactions.js # Model for transactions table
+│   │   └── users.js        # Model for users table
+│   │   └── wallets.js      # Model for wallets table
 │   ├── package.json        # Backend dependencies (e.g., express, pg)
 │   ├── server.js           # Main backend server file
 │   └── .env                # Environment variables (e.g., database credentials)

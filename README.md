@@ -1,7 +1,45 @@
 # crux
 
 /crux/
-├── src/
+├── backend/                          # npm start :5001
+│   ├── config/
+│   │   ├── db.js
+│   ├── routes/
+│   │   ├── api.js
+│   ├── models/
+│   │   ├── ads.js
+│   │   ├── branding.js
+│   │   ├── deliveries.js
+│   │   ├── favorites.js
+│   │   ├── group.js
+│   │   ├── history.js
+│   │   ├── inventory.js
+│   │   ├── locations.js
+│   │   ├── login_history.js
+│   │   ├── messaging.js
+│   │   ├── organization.js
+│   │   ├── permissions.js
+│   │   ├── rating.js
+│   │   ├── status.js
+│   │   ├── transactions.js
+│   │   ├── users.js
+│   │   ├── wallets.js
+│   ├── package.json
+│   ├── server.js
+│   ├── .env
+├── public/                         # http-server -p 8080
+│   ├── assets/
+│   │   ├── images/
+│   │   ├── styles/
+│   │   │   ├── main.scss
+│   ├── css/
+│   │   ├── styles.css
+│   ├── js/
+│   │   ├── login.js
+│   │   ├── register.js
+│   ├── index.html
+│   ├── register.html
+├── src/                            # npm start :5173
 │   ├── delivery-status/
 │   │   ├── delivery-status.html
 │   │   ├── delivery-status.js
@@ -49,25 +87,14 @@
 |   |   |   ├── send-xrp.scss
 |   |   |   ├── transaction-history.scss
 |   |   |   ├── wallet.scss
-├── assets/
 ├── index.html
 ├── index.js
 ├── index.css
 ├── vite.config.js
 ├── package.json
 ├── .env
-
-/crux/
-├── backend/                # New backend folder for PostgreSQL integration
-│   ├── config/             # Configuration files
-│   │   └── db.js           # Database connection setup
-│   ├── routes/             # API route handlers
-│   │   └── api.js          # API endpoints (e.g., /deliveries, /transactions)
-│   ├── models/             # Database models (schema definitions)
-│   │   └── delivery.js     # Model for deliveries table
-│   ├── package.json        # Backend dependencies (e.g., express, pg)
-│   ├── server.js           # Main backend server file
-│   └── .env                # Environment variables (e.g., database credentials)
+├── yarn.lock
+├── prepros.config
 
 
 Escrow:
