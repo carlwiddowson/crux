@@ -1,3 +1,4 @@
+// src/seller-escrows/seller-escrows.js
 import { Wallet, dropsToXrp, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
@@ -96,7 +97,7 @@ async function initSellerEscrows() {
           return {
             fromAddress: createTx?.tx_json.Account || tx.tx_json.Account,
             amount: dropsToXrp(tx.meta.delivered_amount || createTx?.tx_json.Amount || '0'),
-            status: 'closed out',
+            status: 'finished', // Changed from 'closed out' to 'finished'
             condition: createTx?.tx_json.Condition || 'None',
             hash: createTx?.hash || tx.hash || 'N/A',
             dateCreated: tx.date ? rippleTimeToISOTime(tx.date) : 'Unknown',
@@ -131,18 +132,18 @@ async function initSellerEscrows() {
     }
   }
 
-  async function fulfillEscrow(sequence, fulfillment, submitBtn) {
+  async function fulfillEscrow(sequence, fulfillment, submitBtn, row) {
     try {
-      if (!submitBtn) {
-        console.error(`Submit button not provided for sequence: ${sequence}`);
-        throw new Error('Button not provided');
+      if (!submitBtn || !row) {
+        console.error(`Submit button or row not provided for sequence: ${sequence}`);
+        throw new Error('Button or row not provided');
       }
       console.log('Fulfilling escrow with sequence:', sequence, 'Preimage:', fulfillment);
 
       const parsedSequence = parseInt(sequence);
       if (isNaN(parsedSequence)) {
         console.error('Invalid sequence value:', sequence);
-        throw new Error('OfferSequence must be a valid number. Please ensure the escrow sequence is properly set.');
+        throw new Error('OfferSequence must be a valid number.');
       }
 
       submitBtn.disabled = true;
@@ -169,20 +170,34 @@ async function initSellerEscrows() {
       console.log('Submitting transaction with Owner:', ownerAddress, 'txJson:', txJson);
       const response = await submitTransaction({ client, tx: txJson });
       if (response === null) {
-        throw new Error('Transaction submission failed. Check network or client connection.');
+        throw new Error('Transaction submission failed.');
       }
 
       const txResult = response?.result?.engine_result || response?.engine_result || '';
       console.log('EscrowFinish result:', response);
 
       if (txResult === 'tesSUCCESS') {
+        // Update UI immediately
+        const fulfillmentInput = row.querySelector('.fulfillment-input');
+        const cancelBtn = row.querySelector('.cancel-btn');
+        const statusCell = row.querySelector('.status');
+
+        fulfillmentInput.disabled = true;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitted';
+        cancelBtn.disabled = true;
+        statusCell.textContent = 'Finished';
+        statusCell.className = 'status finished';
+
         messageContainer.textContent = 'Escrow fulfilled successfully! Funds released.';
         messageContainer.classList.add('success-message');
         setTimeout(() => {
           messageContainer.textContent = '';
           messageContainer.classList.remove('success-message');
         }, 5000);
-        renderTable();
+
+        // Optional: Full refresh if needed
+        // renderTable();
       } else {
         throw new Error(txResult || 'Unknown transaction failure');
       }
@@ -192,8 +207,6 @@ async function initSellerEscrows() {
       if (submitBtn) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit';
-      } else {
-        console.warn(`Could not re-enable button for sequence: ${sequence}`);
       }
     }
   }
@@ -213,54 +226,13 @@ async function initSellerEscrows() {
       }, 5000);
       cancelBtn.disabled = false;
       cancelBtn.textContent = 'Cancel';
-      return; // Exit early to prevent transaction attempt
-      // The following code is commented out as it’s not applicable for the seller
-      /*
-      const parsedSequence = parseInt(sequence);
-      if (isNaN(parsedSequence)) {
-        console.error('Invalid sequence value:', sequence);
-        throw new Error('OfferSequence must be a valid number. Please ensure the escrow sequence is properly set.');
-      }
-
-      cancelBtn.disabled = true;
-      cancelBtn.textContent = 'Cancelling...';
-
-      const txJson = {
-        TransactionType: 'EscrowCancel',
-        Account: wallet.address,
-        Owner: (await fetchSellerEscrows()).find(e => e.sequence === parsedSequence)?.fromAddress || wallet.address,
-        OfferSequence: parsedSequence,
-      };
-
-      console.log('Submitting cancel transaction:', txJson);
-      const response = await submitTransaction({ client, tx: txJson });
-      if (response === null) {
-        throw new Error('Transaction submission failed. Check network or client connection.');
-      }
-
-      const txResult = response?.result?.engine_result || response?.engine_result || '';
-      console.log('EscrowCancel result:', response);
-
-      if (txResult === 'tesSUCCESS') {
-        messageContainer.textContent = 'Escrow cancelled successfully!';
-        messageContainer.classList.add('success-message');
-        setTimeout(() => {
-          messageContainer.textContent = '';
-          messageContainer.classList.remove('success-message');
-        }, 5000);
-        renderTable();
-      } else {
-        throw new Error(txResult || 'Unknown transaction failure');
-      }
-      */
+      return;
     } catch (error) {
       alert(`Error cancelling escrow: ${error.message}`);
       console.error('Escrow Cancel Error:', error);
       if (cancelBtn) {
         cancelBtn.disabled = false;
         cancelBtn.textContent = 'Cancel';
-      } else {
-        console.warn(`Could not re-enable cancel button for sequence: ${sequence}`);
       }
     }
   }
@@ -275,9 +247,9 @@ async function initSellerEscrows() {
     }
     escrows.forEach(escrow => {
       const row = document.createElement('tr');
-      const isInactive = escrow.status === 'closed out' || escrow.status === 'cancelled';
+      const isInactive = escrow.status === 'finished' || escrow.status === 'cancelled';
       const sequenceAttr = Number.isInteger(escrow.sequence) ? escrow.sequence : '';
-      const displayStatus = escrow.status === 'closed out' ? 'Completed' : escrow.status === 'cancelled' ? 'Cancelled' : escrow.status;
+      const displayStatus = escrow.status.charAt(0).toUpperCase() + escrow.status.slice(1); // Capitalize status
       const disabledAttr = isInactive ? 'disabled' : '';
       console.log('Rendering escrow:', { status: escrow.status, isInactive, disabledAttr });
       row.innerHTML = `
@@ -303,7 +275,7 @@ async function initSellerEscrows() {
         submitBtn.addEventListener('click', () => {
           const fulfillment = fulfillmentInput.value.trim();
           if (fulfillment) {
-            fulfillEscrow(submitBtn.dataset.sequence, fulfillment, submitBtn);
+            fulfillEscrow(submitBtn.dataset.sequence, fulfillment, submitBtn, row);
           } else {
             alert('Please enter the preimage provided by the buyer.');
           }

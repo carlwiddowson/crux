@@ -1,4 +1,5 @@
 <!-- src/map/map.html -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <div id="map"></div>
 <div class="filter-container">
   <select id="category-select">
@@ -9,6 +10,7 @@
   </select>
   <div class="star-rating-container">
     <div class="star-rating" id="star-rating"></div>
+    <button id="clear-stars" class="clear-stars-btn">Clear</button>
     <span id="rating-value" class="rating-label">All</span>
   </div>
   <div class="barrels-container">

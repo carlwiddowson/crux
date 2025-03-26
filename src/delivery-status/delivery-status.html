@@ -1,41 +1,32 @@
+<!-- src/delivery-status/delivery-status.html -->
 <div class="delivery-status-container">
+  <h1 class="page-heading">Delivery Status</h1>
   <div class="filters">
-    <input type="text" id="keyword-search" placeholder="Search by company..." class="search-input">
+    <input class="search-input" type="text" placeholder="Search deliveries...">
     <div class="status-filter">
       <label for="status-select">Status:</label>
-      <select id="status-select" class="status-select">
+      <select class="status-select" id="status-select">
         <option value="">All</option>
-        <option value="In-transit">In-transit</option>
-        <option value="Cancelled">Cancelled</option>
         <option value="Pending">Pending</option>
+        <option value="In-transit">In-transit</option>
         <option value="Delivered">Delivered</option>
+        <option value="Cancelled">Cancelled</option>
       </select>
     </div>
-    <div class="date-filters">
-      <label for="from-date">From:</label>
-      <input type="date" id="from-date" class="date-input">
-      <label for="to-date">To:</label>
-      <input type="date" id="to-date" class="date-input">
-    </div>
   </div>
-  <table class="delivery-table">
+  <table id="delivery-table" class="delivery-table">
     <thead>
       <tr>
         <th data-column="company">Company</th>
-        <th data-column="from">From</th>
-        <th data-column="to">To</th>
-        <th data-column="progress">Progress</th>
+        <th data-column="from_location">From</th>
+        <th data-column="to_location">To</th>
         <th data-column="status">Status</th>
-        <th>Weather Links</th> <!-- Moved to be after Status -->
-        <th data-column="deliveryDate">Delivery Date</th>
-        <th>Actions</th> <!-- Not sortable -->
+        <th data-column="delivery_date">Delivery Date</th>
+        <th>Progress</th>
+        <th data-column="completion">Completion</th>
       </tr>
     </thead>
-    <tbody id="delivery-table-body"></tbody>
+    <tbody></tbody>
   </table>
-  <div class="pagination">
-    <button id="prev-page" disabled>Previous</button>
-    <span id="page-info"></span>
-    <button id="next-page">Next</button>
-  </div>
+  <div id="pagination" class="pagination"></div>
 </div>

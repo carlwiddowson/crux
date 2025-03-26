@@ -45,7 +45,7 @@ export default defineConfig({
     rollupOptions: {
       plugins: [polyfillNode()],
       input: {
-        main: 'index.html',
+        main: resolve(__dirname, 'index.html'), // Single entry point for all routes
       },
     },
   },
@@ -60,6 +60,18 @@ export default defineConfig({
     },
   },
   server: {
-    historyApiFallback: true,
+    historyApiFallback: {
+      rewrites: [
+        // Serve index.html for all routes
+        { from: /\/.*/, to: '/index.html' },
+      ],
+    },
+    middlewareMode: false,
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        console.log(`[Vite Server] Request: ${req.method} ${req.url}`);
+        next();
+      });
+    },
   },
 });

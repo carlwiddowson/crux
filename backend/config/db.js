@@ -7,7 +7,7 @@ const pool = new Pool({
 });
 
 pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database: crux_db_new');
+  console.log('Connected to PostgreSQL database: crux_db_fresh');
 });
 
 pool.on('error', (err) => {

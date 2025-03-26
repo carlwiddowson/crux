@@ -40,13 +40,18 @@
 │   ├── index.html
 │   ├── register.html
 ├── src/                            # npm start :5173
+│   ├── login/
+│   │   ├── login.html
+│   │   ├── login.js
+│   ├── register/
+│   │   ├── register.html
+│   │   ├── register.js
 │   ├── delivery-status/
 │   │   ├── delivery-status.html
 │   │   ├── delivery-status.js
 │   ├── escrow-payments/
 │   │   ├── escrow-payments.html
 │   │   ├── escrow-payments.js
-│   │   ├── data.js   
 │   ├── helpers/
 │   │   ├── xrpl-client.js
 │   │   ├── get-wallet-details.js
