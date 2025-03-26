@@ -135,14 +135,15 @@ function getPageFromPath() {
 }
 
 function updateMenu() {
-  const topNavMenu = document.getElementById('top-nav-menu');
+  const topNav = document.querySelector('.top-nav'); // Target the nav element
   const sidebarMenu = document.getElementById('sidebar-menu');
 
-  if (!topNavMenu || !sidebarMenu) {
+  if (!topNav || !sidebarMenu) {
     console.error('[updateMenu] Menu elements not found');
     return;
   }
 
+  const topNavMenu = document.getElementById('top-nav-menu'); // For content updates
   const loggedOutMenu = `
     <li><a href="/login">Login</a></li>
     <li><a href="/register">Register</a></li>
@@ -162,9 +163,12 @@ function updateMenu() {
   `;
 
   if (isLoggedIn()) {
-    topNavMenu.innerHTML = '<li><a href="#" id="top-logout-link">Logout</a></li>';
+    console.log('[updateMenu] User logged in, hiding top-nav');
+    topNav.classList.add('hidden');
     sidebarMenu.innerHTML = loggedInMenu;
   } else {
+    console.log('[updateMenu] User logged out, showing top-nav');
+    topNav.classList.remove('hidden');
     topNavMenu.innerHTML = loggedOutMenu;
     sidebarMenu.innerHTML = '';
   }
@@ -173,10 +177,11 @@ function updateMenu() {
   console.log('[updateMenu] Nav links found:', navLinks.length);
   navLinks.forEach(link => link.addEventListener('click', handleNavigation));
 
-  const logoutLink = document.getElementById('logout-link') || document.getElementById('top-logout-link');
+  const logoutLink = document.getElementById('logout-link');
   if (logoutLink) {
     logoutLink.addEventListener('click', (e) => {
       e.preventDefault();
+      console.log('[updateMenu] Logout clicked');
       logout();
     });
   }

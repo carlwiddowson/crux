@@ -1,3 +1,4 @@
+// src/buyer-purchases/buyer-purchases.js
 import { Wallet, dropsToXrp, isValidClassicAddress, xrpToDrops, rippleTimeToISOTime } from 'xrpl';
 import { setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
@@ -22,8 +23,9 @@ async function initBuyerPurchases() {
   const submitPurchaseBtn = document.querySelector('#submit_purchase_button');
   const tableBody = document.querySelector('#purchases_table_body');
   const walletBalanceDisplay = document.querySelector('#wallet_balance');
+  const processingModal = document.querySelector('#processing-modal');
 
-  if (!sellerAddress || !amount || !submitPurchaseBtn || !tableBody || !walletBalanceDisplay) {
+  if (!sellerAddress || !amount || !submitPurchaseBtn || !tableBody || !walletBalanceDisplay || !processingModal) {
     console.error('Required DOM elements not found');
     return;
   }
@@ -183,6 +185,9 @@ async function initBuyerPurchases() {
       submitPurchaseBtn.disabled = true;
       submitPurchaseBtn.textContent = 'Creating...';
 
+      // Show processing modal
+      processingModal.classList.add('active');
+
       const accountInfo = await client.request({
         command: 'account_info',
         account: wallet.address,
@@ -234,7 +239,7 @@ async function initBuyerPurchases() {
       console.log('Raw transaction response:', response);
 
       if (response === null) {
-        throw new Error('Transaction submission failed. Check network connection or wallet balance.');
+        throw new Error('Transaction submission failed.');
       }
 
       const txResult = response?.result?.engine_result || response?.engine_result || '';
@@ -266,9 +271,14 @@ async function initBuyerPurchases() {
         renderTable([...await fetchPurchases(), newEscrow]);
         sellerAddress.value = '';
         amount.value = '';
+
+        // Wait for the final refresh with the key
         await new Promise(resolve => setTimeout(resolve, 10000));
         renderTable();
         updateWalletBalance();
+
+        // Hide modal after the table refreshes with the key
+        processingModal.classList.remove('active');
       } else {
         const errorMsg = txResult ? `Transaction failed with result: ${txResult}` : 'Unknown transaction failure';
         throw new Error(`${errorMsg}. Response: ${JSON.stringify(response)}`);
@@ -287,6 +297,7 @@ async function initBuyerPurchases() {
       submitPurchaseBtn.textContent = 'Create Purchase';
       updateButtonState();
       updateWalletBalance();
+      // Modal stays until success or manual removal in error case
     }
   }
 
@@ -302,7 +313,6 @@ async function initBuyerPurchases() {
         : new Date(purchase.dateCreated).toLocaleString() === 'Invalid Date'
         ? 'Unknown'
         : new Date(purchase.dateCreated).toLocaleString();
-      // Show copy button only for valid fulfillment keys (hexadecimal, not status text)
       const isValidKey = purchase.fulfillment && !['Pending', 'Provided', 'Cancelled'].includes(purchase.fulfillment) && /^[0-9A-F]+$/i.test(purchase.fulfillment);
       const copyButton = isValidKey ? `<button class="copy-btn" data-fulfillment="${purchase.fulfillment}" title="Copy to clipboard"><img src="${copyIconSvg}" alt="Copy" width="16" height="16" style="vertical-align: middle;"></button>` : '';
       row.innerHTML = `
@@ -318,7 +328,6 @@ async function initBuyerPurchases() {
       `;
       tableBody.appendChild(row);
 
-      // Add copy to clipboard functionality only for valid keys
       if (isValidKey) {
         const copyBtn = row.querySelector('.copy-btn');
         copyBtn.addEventListener('click', () => {

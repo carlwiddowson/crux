@@ -53,13 +53,11 @@
     }
     .charts {
       display: flex;
-      gap: 20px;
-
-      .chart {
-        width: 45%;
-      }
+      gap: 40px;
+      
       .balance-chart,
       .delivery-status-chart {
+        width: 45%;
         margin-bottom: 30px;
         text-align: center;
 
