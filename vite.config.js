@@ -1,3 +1,4 @@
+// vite.config.js
 import { defineConfig } from 'vite';
 import polyfillNode from 'rollup-plugin-polyfill-node';
 import { resolve } from 'path';
@@ -45,7 +46,18 @@ export default defineConfig({
     rollupOptions: {
       plugins: [polyfillNode()],
       input: {
-        main: resolve(__dirname, 'index.html'), // Single entry point for all routes
+        main: resolve(__dirname, 'index.html'), // Main entry point
+        login: resolve(__dirname, 'src/login/login.html'),
+        dashboard: resolve(__dirname, 'src/dashboard/dashboard.html'),
+        wallet: resolve(__dirname, 'src/wallet/wallet.html'),
+        'send-xrp': resolve(__dirname, 'src/send-xrp/send-xrp.html'),
+        'escrow-payments': resolve(__dirname, 'src/escrow-payments/escrow-payments.html'),
+        'buyer-purchases': resolve(__dirname, 'src/buyer-purchases/buyer-purchases.html'),
+        'seller-escrows': resolve(__dirname, 'src/seller-escrows/seller-escrows.html'),
+        'transaction-history': resolve(__dirname, 'src/transaction-history/transaction-history.html'),
+        map: resolve(__dirname, 'src/map/map.html'),
+        'delivery-status': resolve(__dirname, 'src/delivery-status/delivery-status.html'),
+        register: resolve(__dirname, 'src/register/register.html'), // If you have a register page
       },
     },
   },
@@ -62,7 +74,6 @@ export default defineConfig({
   server: {
     historyApiFallback: {
       rewrites: [
-        // Serve index.html for all routes
         { from: /\/.*/, to: '/index.html' },
       ],
     },

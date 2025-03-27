@@ -58,7 +58,7 @@ async function loadPage(pageName) {
   xrplClientManager.cleanupListeners(previousPage);
 
   try {
-    const htmlUrl = `/src/${pageName}/${pageName}.html`;
+    const htmlUrl = `/${pageName}.html`; // Adjusted to root path
     console.log(`[loadPage] Fetching HTML from: ${htmlUrl}`);
     const htmlResponse = await fetch(htmlUrl);
     if (!htmlResponse.ok) {
@@ -77,7 +77,7 @@ async function loadPage(pageName) {
     const script = document.createElement('script');
     script.type = 'module';
     script.id = 'page-script';
-    const scriptUrl = `/src/${pageName}/${pageName}.js?t=${Date.now()}`; // Cache-bust to reload fresh
+    const scriptUrl = `/src/${pageName}/${pageName}.js?t=${Date.now()}`; // Keep JS path for now
     console.log(`[loadPage] Loading script from: ${scriptUrl}`);
     script.src = scriptUrl;
     script.onload = () => console.log(`[loadPage] ${pageName}.js loaded`);
@@ -135,7 +135,7 @@ function getPageFromPath() {
 }
 
 function updateMenu() {
-  const topNav = document.querySelector('.top-nav'); // Target the nav element
+  const topNav = document.querySelector('.top-nav');
   const sidebarMenu = document.getElementById('sidebar-menu');
 
   if (!topNav || !sidebarMenu) {
@@ -143,7 +143,7 @@ function updateMenu() {
     return;
   }
 
-  const topNavMenu = document.getElementById('top-nav-menu'); // For content updates
+  const topNavMenu = document.getElementById('top-nav-menu');
   const loggedOutMenu = `
     <li><a href="/login">Login</a></li>
     <li><a href="/register">Register</a></li>
@@ -229,7 +229,6 @@ window.addEventListener('beforeunload', () => {
   xrplClientManager.disconnect();
 });
 
-// Export all functions for use in other modules
 export { 
   loadComponent, 
   setPageTitle, 
