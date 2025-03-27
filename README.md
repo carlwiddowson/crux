@@ -27,18 +27,6 @@
 │   ├── package.json
 │   ├── server.js
 │   ├── .env
-├── public/                         # http-server -p 8080
-│   ├── assets/
-│   │   ├── images/
-│   │   ├── styles/
-│   │   │   ├── main.scss
-│   ├── css/
-│   │   ├── styles.css
-│   ├── js/
-│   │   ├── login.js
-│   │   ├── register.js
-│   ├── index.html
-│   ├── register.html
 ├── src/                            # npm start :5173
 │   ├── login/
 │   │   ├── login.html
