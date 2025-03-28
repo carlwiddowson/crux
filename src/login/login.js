@@ -34,10 +34,11 @@ async function handleLogin(e) {
   console.log('[login.js] Submitting:', { email, password });
 
   try {
-    const response = await fetch('http://localhost:5001/api/login', {
+    const response = await fetch('https://crux-omega.vercel.app/api/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
+      credentials: 'include', // Include cookies
     });
     console.log('[login.js] Fetch response status:', response.status);
 
@@ -47,9 +48,8 @@ async function handleLogin(e) {
       throw new Error(errorData.error || 'Login failed');
     }
 
-    const { token } = await response.json();
-    localStorage.setItem('authToken', token);
-    console.log('[login.js] Login successful, token stored:', token);
+    const data = await response.json();
+    console.log('[login.js] Login successful:', data.message);
 
     window.history.pushState({}, '', '/dashboard');
     console.log('[login.js] Redirecting to dashboard');
