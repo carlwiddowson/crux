@@ -2,7 +2,7 @@
 import { loadPage, setPageTitle } from '/index.js';
 
 console.log('[login.js] Script loaded');
-setPageTitle('Login');
+setPageTitle('Logins');
 
 const loginFormImmediate = document.getElementById('login-form');
 console.log('[login.js] Immediate check - Login form:', loginFormImmediate || 'Not found yet');

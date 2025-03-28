@@ -39,7 +39,7 @@ export default defineConfig({
         global: 'globalThis',
       },
     },
-    include: ['five-bells-condition', 'crypto-browserify', 'buffer', 'process', 'create-hash'], // Add create-hash
+    include: ['five-bells-condition', 'crypto-browserify', 'buffer', 'process', 'create-hash'],
   },
   build: {
     outDir: 'dist',
@@ -63,7 +63,14 @@ export default defineConfig({
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
+        assetFileNames: (assetInfo) => {
+          // Flatten HTML files to dist/ root
+          if (assetInfo.name && assetInfo.name.endsWith('.html')) {
+            const name = assetInfo.name.split('/').pop(); // Get the file name (e.g., login.html)
+            return `${name}`; // Output to dist/login.html
+          }
+          return 'assets/[name]-[hash].[ext]'; // Other assets go to dist/assets/
+        },
       },
     },
   },

@@ -58,31 +58,17 @@ async function loadPage(pageName) {
   xrplClientManager.cleanupListeners(previousPage);
 
   try {
-    const htmlUrl = `/${pageName}.html`; // Fetch from root, e.g., /login.html
+    const htmlUrl = `/${pageName}.html`;
     console.log(`[loadPage] Fetching HTML from: ${htmlUrl}`);
+    console.log(`[loadPage] Full URL: ${window.location.origin}${htmlUrl}`);
     const htmlResponse = await fetch(htmlUrl);
+    console.log(`[loadPage] Fetch response status: ${htmlResponse.status}`);
     if (!htmlResponse.ok) {
       throw new Error(`[loadPage] Failed to fetch ${pageName}.html: ${htmlResponse.status} ${htmlResponse.statusText}`);
     }
     const html = await htmlResponse.text();
     console.log(`[loadPage] HTML fetched successfully: ${html.slice(0, 100)}...`);
     contentContainer.innerHTML = html;
-
-    const existingScript = document.getElementById('page-script');
-    if (existingScript) {
-      console.log('[loadPage] Removing existing script');
-      existingScript.remove();
-    }
-
-    const script = document.createElement('script');
-    script.type = 'module';
-    script.id = 'page-script';
-    const scriptUrl = `/src/${pageName}/${pageName}.js`; // Static path for production
-    console.log(`[loadPage] Loading script from: ${scriptUrl}`);
-    script.src = scriptUrl;
-    script.onload = () => console.log(`[loadPage] ${pageName}.js loaded`);
-    script.onerror = () => console.log(`[loadPage] No JS file found for ${pageName}`);
-    document.body.appendChild(script);
 
     toggleSidebar(pageName !== 'login' && pageName !== 'register');
     updateMenu();
@@ -229,9 +215,10 @@ window.addEventListener('beforeunload', () => {
   xrplClientManager.disconnect();
 });
 
+// Export all functions for use in other modules
 export { 
   loadComponent, 
-  setPageTitle, 
+  setPageTitle, // Added setPageTitle to exports
   toggleSidebar, 
   loadPage, 
   isLoggedIn, 
