@@ -23,6 +23,7 @@ const env = loadEnvFile();
 
 export default defineConfig({
   root: './',
+  publicDir: 'public', // Ensure public assets are copied
   define: {
     'process.env': JSON.stringify(env),
     'global': 'globalThis',
@@ -49,7 +50,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'src/login/login.html'),
-        login_js: resolve(__dirname, 'src/login/login.js'), // Explicitly include login.js
+        login_js: resolve(__dirname, 'src/login/login.js'), // Ensure login.js is bundled
         dashboard: resolve(__dirname, 'src/dashboard/dashboard.html'),
         wallet: resolve(__dirname, 'src/wallet/wallet.html'),
         send_xrp: resolve(__dirname, 'src/send-xrp/send-xrp.html'),
