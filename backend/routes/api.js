@@ -119,4 +119,14 @@ router.get('/deliveries', authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW()');
+    res.json({ time: result.rows[0].now });
+  } catch (error) {
+    console.error('[api.js] Test DB error:', error);
+    res.status(500).json({ error: 'Database test failed' });
+  }
+});
+
 module.exports = router;

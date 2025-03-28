@@ -1,11 +1,8 @@
 // src/login/login.js
 import { loadPage, setPageTitle } from '/index.js';
+import xrplClientManager from '../helpers/xrpl-client.js';
 
 console.log('[login.js] Script loaded');
-setPageTitle('Logins');
-
-const loginFormImmediate = document.getElementById('login-form');
-console.log('[login.js] Immediate check - Login form:', loginFormImmediate || 'Not found yet');
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('[login.js] DOMContentLoaded fired');
@@ -16,28 +13,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   console.log('[login.js] Login form found:', loginForm);
 
+  setPageTitle('Login');
+
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     console.log('[login.js] Form submitted (main)');
     await handleLogin(e);
   });
 });
-
-// Fallback if DOM already loaded
-if (document.readyState !== 'loading') {
-  console.log('[login.js] DOM already loaded, running setup');
-  const loginFormFallback = document.getElementById('login-form');
-  if (loginFormFallback) {
-    console.log('[login.js] Fallback - Login form found:', loginFormFallback);
-    loginFormFallback.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      console.log('[login.js] Form submitted (fallback)');
-      await handleLogin(e);
-    });
-  } else {
-    console.error('[login.js] Fallback - Login form not found');
-  }
-}
 
 async function handleLogin(e) {
   const email = document.getElementById('email').value.trim();

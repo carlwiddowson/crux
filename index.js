@@ -42,6 +42,8 @@ function toggleSidebar(show) {
       sidebar.style.display = 'none';
       mainContent.classList.remove('with-sidebar');
     }
+  } else {
+    console.error('[toggleSidebar] Sidebar or main-content element not found');
   }
 }
 
@@ -49,16 +51,12 @@ async function loadPage(pageName) {
   console.log(`[loadPage] Loading page: ${pageName}`);
   const contentContainer = document.getElementById('page-content');
   if (!contentContainer) {
-    console.error('[loadPage] Content container not found');
+    console.error('[loadPage] Content container not found. Ensure index.html is loaded with the correct structure.');
     return;
   }
 
-  // Cleanup listeners for the previous page
-  const previousPage = window.currentPage || 'none';
-  xrplClientManager.cleanupListeners(previousPage);
-
   try {
-    const htmlUrl = `/${pageName}.html`;
+    const htmlUrl = `/src/${pageName}/${pageName}.html`;
     console.log(`[loadPage] Fetching HTML from: ${htmlUrl}`);
     console.log(`[loadPage] Full URL: ${window.location.origin}${htmlUrl}`);
     const htmlResponse = await fetch(htmlUrl);
@@ -215,10 +213,9 @@ window.addEventListener('beforeunload', () => {
   xrplClientManager.disconnect();
 });
 
-// Export all functions for use in other modules
 export { 
   loadComponent, 
-  setPageTitle, // Added setPageTitle to exports
+  setPageTitle, 
   toggleSidebar, 
   loadPage, 
   isLoggedIn, 

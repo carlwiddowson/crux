@@ -1,4 +1,3 @@
-// vercel.json
 {
   "version": 2,
   "builds": [
@@ -17,8 +16,7 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "backend/server.js" },
-    { "src": "/(login|dashboard|wallet|send-xrp|escrow-payments|buyer-purchases|seller-escrows|transaction-history|map|delivery-status|register)\\.html", "dest": "dist/$1.html" },
-    { "src": "/src/(.*)", "dest": "dist/src/$1" },
+    { "src": "/src/(login|dashboard|wallet|send-xrp|escrow-payments|buyer-purchases|seller-escrows|transaction-history|map|delivery-status|register)/(.*)\\.html", "dest": "dist/src/$1/$2.html" },
     { "src": "/(.*)", "dest": "dist/index.html" }
   ],
   "installCommand": "yarn install"
