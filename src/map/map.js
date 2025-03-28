@@ -1,6 +1,7 @@
 // src/map/map.js
+// Remove: import L from 'leaflet';
+// Use global L from CDN
 import { setPageTitle } from '/index.js';
-import L from 'leaflet';
 import { companies } from '../helpers/data.js';
 
 setPageTitle('Map');
@@ -16,6 +17,7 @@ function initMap() {
     return;
   }
 
+  // Use global L (from CDN)
   map = L.map(mapContainer).setView([39.8283, -98.5795], 2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -25,6 +27,8 @@ function initMap() {
   renderMap(companies);
   setupFilters();
 }
+
+// ... rest of map.js unchanged ...
 
 function renderMap(filteredCompanies) {
   markers.forEach(marker => marker.remove());

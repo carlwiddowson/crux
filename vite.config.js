@@ -39,14 +39,15 @@ export default defineConfig({
         global: 'globalThis',
       },
     },
-    include: ['five-bells-condition', 'crypto-browserify', 'buffer', 'process'],
+    include: ['five-bells-condition', 'crypto-browserify', 'buffer', 'process', 'create-hash'], // Add create-hash
   },
   build: {
     outDir: 'dist',
     rollupOptions: {
       plugins: [polyfillNode()],
+      external: ['leaflet'],
       input: {
-        main: resolve(__dirname, 'index.html'), // Main entry point
+        main: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'src/login/login.html'),
         dashboard: resolve(__dirname, 'src/dashboard/dashboard.html'),
         wallet: resolve(__dirname, 'src/wallet/wallet.html'),
@@ -57,7 +58,12 @@ export default defineConfig({
         'transaction-history': resolve(__dirname, 'src/transaction-history/transaction-history.html'),
         map: resolve(__dirname, 'src/map/map.html'),
         'delivery-status': resolve(__dirname, 'src/delivery-status/delivery-status.html'),
-        register: resolve(__dirname, 'src/register/register.html'), // If you have a register page
+        register: resolve(__dirname, 'src/register/register.html'),
+      },
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
   },
