@@ -49,6 +49,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         login: resolve(__dirname, 'src/login/login.html'),
+        login_js: resolve(__dirname, 'src/login/login.js'), // Explicitly include login.js
         dashboard: resolve(__dirname, 'src/dashboard/dashboard.html'),
         wallet: resolve(__dirname, 'src/wallet/wallet.html'),
         send_xrp: resolve(__dirname, 'src/send-xrp/send-xrp.html'),
@@ -60,7 +61,17 @@ export default defineConfig({
         delivery_status: resolve(__dirname, 'src/delivery-status/delivery-status.html'),
         register: resolve(__dirname, 'src/register/register.html'),
       },
-      // ... rest unchanged ...
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.html')) {
+            const key = assetInfo.name.split('/').slice(-2, -1)[0];
+            return `src/${key}/${key}.html`;
+          }
+          return 'assets/[name]-[hash].[ext]';
+        },
+      },
     },
   },
   resolve: {

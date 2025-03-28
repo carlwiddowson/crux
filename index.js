@@ -215,7 +215,7 @@ window.addEventListener('beforeunload', () => {
 
 export { 
   loadComponent, 
-  setPageTitle, 
+  setPageTitle, // Ensure setPageTitle is exported
   toggleSidebar, 
   loadPage, 
   isLoggedIn, 
