@@ -58,7 +58,7 @@ async function loadPage(pageName) {
   xrplClientManager.cleanupListeners(previousPage);
 
   try {
-    const htmlUrl = `/${pageName}.html`; // Adjusted to root path
+    const htmlUrl = `/${pageName}.html`; // Fetch from root, e.g., /login.html
     console.log(`[loadPage] Fetching HTML from: ${htmlUrl}`);
     const htmlResponse = await fetch(htmlUrl);
     if (!htmlResponse.ok) {
@@ -77,7 +77,7 @@ async function loadPage(pageName) {
     const script = document.createElement('script');
     script.type = 'module';
     script.id = 'page-script';
-    const scriptUrl = `/src/${pageName}/${pageName}.js?t=${Date.now()}`; // Keep JS path for now
+    const scriptUrl = `/src/${pageName}/${pageName}.js`; // Static path for production
     console.log(`[loadPage] Loading script from: ${scriptUrl}`);
     script.src = scriptUrl;
     script.onload = () => console.log(`[loadPage] ${pageName}.js loaded`);
