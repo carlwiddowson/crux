@@ -1,11 +1,12 @@
 // backend/server.js
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser'); // Add cookie-parser
 const apiRoutes = require('./routes/api');
 const path = require('path');
 require('dotenv').config();
 
-console.log('[server.js] JWT_SECRET:', process.env.JWT_SECRET); // Debug log
+console.log('[server.js] JWT_SECRET:', process.env.JWT_SECRET);
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser()); // Add cookie-parser middleware
 app.use('/api', apiRoutes);
 
 app.get('/test', (req, res) => {

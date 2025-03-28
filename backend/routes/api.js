@@ -19,6 +19,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    console.log('[api.js] Generating token...');
     const token = jwt.sign(
       { user_id: user.user_id, email: user.email, organization_id: user.organization_id },
       JWT_SECRET,
@@ -26,16 +27,18 @@ router.post('/login', async (req, res) => {
     );
     console.log('[api.js] Token generated:', token);
 
+    console.log('[api.js] Setting cookie...');
     res.cookie('authToken', token, {
       httpOnly: true,
       secure: true,
       sameSite: 'Strict',
-      maxAge: 3600000, // 1 hour
+      maxAge: 3600000,
     });
+    console.log('[api.js] Cookie set');
 
     res.json({ message: 'Login successful' });
   } catch (error) {
-    console.error('[api.js] Login error:', error.message);
+    console.error('[api.js] Login error:', error.message, error.stack);
     res.status(500).json({ error: 'Login failed: ' + error.message });
   }
 });

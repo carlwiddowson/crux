@@ -2,10 +2,10 @@
 import { loadPage, setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
 
-console.log('[login.js] Script loaded');
+console.log('[login.js] Script loaded - DEBUG');
 
 function initializeLogin() {
-  console.log('[login.js] Initializing login');
+  console.log('[login.js] Initializing login - DEBUG');
   const loginForm = document.getElementById('login-form');
   if (!loginForm) {
     console.error('[login.js] Login form not found');
@@ -22,11 +22,14 @@ function initializeLogin() {
   });
 }
 
-// Run immediately if DOM is already loaded, otherwise wait for DOMContentLoaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  console.log('[login.js] DOM already loaded, running initializeLogin');
   initializeLogin();
 } else {
-  document.addEventListener('DOMContentLoaded', initializeLogin);
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[login.js] DOMContentLoaded fired, running initializeLogin');
+    initializeLogin();
+  });
 }
 
 async function handleLogin(e) {

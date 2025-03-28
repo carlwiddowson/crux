@@ -68,6 +68,14 @@ async function loadPage(pageName) {
     console.log(`[loadPage] HTML fetched successfully: ${html.slice(0, 100)}...`);
     contentContainer.innerHTML = html;
 
+    // Dynamically load the page's script
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = `/src/${pageName}/${pageName}.js`;
+    script.onload = () => console.log(`[loadPage] ${pageName}.js loaded`);
+    script.onerror = () => console.error(`[loadPage] Failed to load ${pageName}.js`);
+    document.body.appendChild(script);
+
     toggleSidebar(pageName !== 'login' && pageName !== 'register');
     updateMenu();
     setPageTitle(pageName.charAt(0).toUpperCase() + pageName.slice(1));

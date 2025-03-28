@@ -23,7 +23,7 @@ const env = loadEnvFile();
 
 export default defineConfig({
   root: './',
-  publicDir: 'public', // Ensure public assets are copied
+  publicDir: 'public',
   define: {
     'process.env': JSON.stringify(env),
     'global': 'globalThis',
