@@ -4,8 +4,8 @@ import xrplClientManager from '../helpers/xrpl-client.js';
 
 console.log('[login.js] Script loaded');
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('[login.js] DOMContentLoaded fired');
+function initializeLogin() {
+  console.log('[login.js] Initializing login');
   const loginForm = document.getElementById('login-form');
   if (!loginForm) {
     console.error('[login.js] Login form not found');
@@ -20,7 +20,14 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('[login.js] Form submitted (main)');
     await handleLogin(e);
   });
-});
+}
+
+// Run immediately if DOM is already loaded, otherwise wait for DOMContentLoaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  initializeLogin();
+} else {
+  document.addEventListener('DOMContentLoaded', initializeLogin);
+}
 
 async function handleLogin(e) {
   const email = document.getElementById('email').value.trim();
@@ -38,7 +45,7 @@ async function handleLogin(e) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-      credentials: 'include', // Include cookies
+      credentials: 'include',
     });
     console.log('[login.js] Fetch response status:', response.status);
 
