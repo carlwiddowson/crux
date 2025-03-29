@@ -37,3 +37,4 @@ Thumbs.db
 
 # Optional: Local development files
 *.log
+.vercel

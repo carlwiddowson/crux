@@ -2,10 +2,10 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-console.log('[db.js] DATABASE_URL from process.env:', process.env.DATABASE_URL); // Debug log
+console.log('[db.js] DATABASE_URL from process.env:', process.env.DATABASE_URL);
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_i6zJMRrU5THD@ep-little-silence-a42gcnry-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require';
-console.log('[db.js] Using connectionString:', connectionString); // Debug log
+console.log('[db.js] Using connectionString:', connectionString);
 
 const pool = new Pool({
   connectionString: connectionString,

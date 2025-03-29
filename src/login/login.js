@@ -21,26 +21,31 @@ async function fetchFirstUserEmail() {
 
     const data = await response.json();
     console.log('[login.js] First user email fetched:', data.email);
+
+    // Ensure the DOM element exists before updating
     const emailElement = document.getElementById('first-user-email');
     if (emailElement) {
       emailElement.textContent = data.email;
+      console.log('[login.js] First user email updated in DOM - DEBUG 3');
     } else {
-      console.error('[login.js] First user email element not found - DEBUG 3');
+      console.error('[login.js] First user email element not found - DEBUG 4');
     }
   } catch (error) {
     console.error('[login.js] Error fetching first user email:', error.message);
     const emailElement = document.getElementById('first-user-email');
     if (emailElement) {
       emailElement.textContent = 'Error: ' + error.message;
+    } else {
+      console.error('[login.js] First user email element not found on error - DEBUG 5');
     }
   }
 }
 
 function initializeLogin() {
-  console.log('[login.js] Initializing login - DEBUG 4');
+  console.log('[login.js] Initializing login - DEBUG 6');
   const loginForm = document.getElementById('login-form');
   if (!loginForm) {
-    console.error('[login.js] Login form not found - DEBUG 5');
+    console.error('[login.js] Login form not found - DEBUG 7');
     return;
   }
   console.log('[login.js] Login form found:', loginForm);
@@ -49,37 +54,46 @@ function initializeLogin() {
 
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    console.log('[login.js] Form submitted (main) - DEBUG 6');
+    console.log('[login.js] Form submitted (main) - DEBUG 8');
     await handleLogin(e);
   });
 
-  // Fetch the first user's email when the page loads
-  fetchFirstUserEmail();
+  // Fetch the first user's email after a delay to ensure DOM is ready
+  setTimeout(() => {
+    console.log('[login.js] Running fetchFirstUserEmail with delay - DEBUG 9');
+    fetchFirstUserEmail();
+  }, 1000);
 }
 
 // Run immediately if DOM is ready, otherwise wait for DOMContentLoaded
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  console.log('[login.js] DOM already loaded, running initializeLogin - DEBUG 7');
+  console.log('[login.js] DOM already loaded, running initializeLogin - DEBUG 10');
   initializeLogin();
 } else {
   document.addEventListener('DOMContentLoaded', () => {
-    console.log('[login.js] DOMContentLoaded fired, running initializeLogin - DEBUG 8');
+    console.log('[login.js] DOMContentLoaded fired, running initializeLogin - DEBUG 11');
     initializeLogin();
   });
 }
 
 // Fallback: Retry after a longer delay if DOMContentLoaded doesn't fire
 setTimeout(() => {
-  console.log('[login.js] Running initializeLogin with longer delay - DEBUG 9');
+  console.log('[login.js] Running initializeLogin with longer delay - DEBUG 12');
   initializeLogin();
-}, 5000);
+}, 30000);
+
+// Fallback: Retry again after an even longer delay
+setTimeout(() => {
+  console.log('[login.js] Running initializeLogin with even longer delay - DEBUG 13');
+  initializeLogin();
+}, 60000);
 
 async function handleLogin(e) {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
 
   if (!email || !password) {
-    console.log('[login.js] Missing email or password - DEBUG 10');
+    console.log('[login.js] Missing email or password - DEBUG 14');
     alert('Please enter both email and password.');
     return;
   }
@@ -104,7 +118,7 @@ async function handleLogin(e) {
     console.log('[login.js] Login successful:', data.message);
 
     window.history.pushState({}, '', '/dashboard');
-    console.log('[login.js] Redirecting to dashboard - DEBUG 11');
+    console.log('[login.js] Redirecting to dashboard - DEBUG 15');
     loadPage('dashboard');
   } catch (error) {
     console.error('[login.js] Login error:', error.message);
