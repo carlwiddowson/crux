@@ -9,7 +9,10 @@ require('dotenv').config();
 
 console.log('[api.js] JWT module:', jwt);
 
+// Define router at the top
 const router = express.Router();
+
+// Set JWT_SECRET
 const JWT_SECRET = process.env.JWT_SECRET || 'rtIxhQbDEPA4IBViiisIwE619dgCYjAWemJNfnDqZP8=';
 console.log('[api.js] JWT_SECRET:', JWT_SECRET);
 
@@ -25,7 +28,7 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-// New endpoint to fetch the first user
+// Endpoint to fetch the first user
 router.get('/first-user', async (req, res) => {
   try {
     console.log('[api.js] Fetching first user...');
@@ -43,7 +46,29 @@ router.get('/first-user', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  // ... (unchanged) ...
+  try {
+    const { first_name, last_name, email, password, organization_id } = req.body;
+    console.log('[api.js] Register attempt for email:', email);
+
+    const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    if (userResult.rows.length > 0) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('[api.js] Password hashed');
+
+    const newUser = await pool.query(
+      'INSERT INTO users (first_name, last_name, email, password, organization_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [first_name, last_name, email, hashedPassword, organization_id]
+    );
+    console.log('[api.js] New user created:', newUser.rows[0]);
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('[api.js] Register error:', error.message, error.stack);
+    res.status(500).json({ error: 'Registration failed: ' + error.message });
+  }
 });
 
 router.post('/login', async (req, res) => {
@@ -91,6 +116,71 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ... rest of the routes unchanged ...
+router.get('/dashboard', authenticateToken, async (req, res) => {
+  try {
+    console.log('[api.js] Fetching dashboard data for user:', req.user.email);
+
+    // Fetch user info
+    const userResult = await pool.query('SELECT * FROM users WHERE email = $1', [req.user.email]);
+    const user = userResult.rows[0];
+    if (!user) throw new Error('User not found');
+
+    // Fetch delivery status counts
+    const deliveryResult = await pool.query(`
+      SELECT status, COUNT(*) as count 
+      FROM deliveries 
+      GROUP BY status
+    `);
+    const deliveryStatusCounts = {
+      Pending: 0,
+      'In-transit': 0,
+      Delivered: 0,
+      Cancelled: 0,
+    };
+    deliveryResult.rows.forEach(row => {
+      if (deliveryStatusCounts.hasOwnProperty(row.status)) {
+        deliveryStatusCounts[row.status] = parseInt(row.count);
+      }
+    });
+
+    // Placeholder for wallet data (update with real data if available)
+    const walletBalance = 1000;
+    const escrowLocked = 50;
+    const escrowReleased = 200;
+
+    const responseData = {
+      user: {
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        organization_id: user.organization_id,
+      },
+      message: 'Welcome back to CruX!',
+      wallet: {
+        balance: walletBalance,
+        escrow_locked: escrowLocked,
+        escrow_released: escrowReleased,
+      },
+      delivery_status: deliveryStatusCounts,
+    };
+
+    console.log('[api.js] Dashboard response data:', responseData);
+    res.json(responseData);
+  } catch (error) {
+    console.error('[api.js] Error fetching dashboard data:', error.message);
+    res.status(500).json({ error: 'Failed to fetch dashboard data: ' + error.message });
+  }
+});
+
+router.get('/deliveries', authenticateToken, async (req, res) => {
+  try {
+    console.log('[api.js] Fetching deliveries');
+    const result = await pool.query('SELECT * FROM deliveries ORDER BY id ASC');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('[api.js] Error fetching deliveries:', error.message);
+    res.status(500).json({ error: 'Failed to fetch deliveries: ' + error.message });
+  }
+});
 
 module.exports = router;
