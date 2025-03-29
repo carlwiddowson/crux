@@ -38,3 +38,5 @@ Thumbs.db
 # Optional: Local development files
 *.log
 .vercel
+package-lock.json
+package-lock.json
