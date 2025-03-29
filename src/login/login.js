@@ -1,4 +1,4 @@
-// src/login/login.js
+// src/login/login.js (updated)
 import { loadPage, setPageTitle } from '/index.js';
 import xrplClientManager from '../helpers/xrpl-client.js';
 
@@ -57,18 +57,29 @@ function initializeLogin() {
   fetchFirstUserEmail();
 }
 
-// Add a slight delay to ensure DOM is ready
-setTimeout(() => {
-  console.log('[login.js] Running initializeLogin with delay - DEBUG 7');
+// Run immediately if DOM is ready, otherwise wait for DOMContentLoaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  console.log('[login.js] DOM already loaded, running initializeLogin - DEBUG 7');
   initializeLogin();
-}, 100);
+} else {
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[login.js] DOMContentLoaded fired, running initializeLogin - DEBUG 8');
+    initializeLogin();
+  });
+}
+
+// Fallback: Retry after a longer delay if DOMContentLoaded doesn't fire
+setTimeout(() => {
+  console.log('[login.js] Running initializeLogin with longer delay - DEBUG 9');
+  initializeLogin();
+}, 5000);
 
 async function handleLogin(e) {
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value.trim();
 
   if (!email || !password) {
-    console.log('[login.js] Missing email or password - DEBUG 8');
+    console.log('[login.js] Missing email or password - DEBUG 10');
     alert('Please enter both email and password.');
     return;
   }
@@ -93,7 +104,7 @@ async function handleLogin(e) {
     console.log('[login.js] Login successful:', data.message);
 
     window.history.pushState({}, '', '/dashboard');
-    console.log('[login.js] Redirecting to dashboard - DEBUG 9');
+    console.log('[login.js] Redirecting to dashboard - DEBUG 11');
     loadPage('dashboard');
   } catch (error) {
     console.error('[login.js] Login error:', error.message);
